@@ -1,0 +1,12 @@
+[submodule "Assets/Plugins/Submodules/unity-lnx-arch"]
+	path = Assets/Plugins/Submodules/unity-lnx-arch
+	url = https://github.com/HugoLnx/unity-lnx-arch.git
+	branch = dev
+[submodule "Assets/Plugins/Submodules/unity-sensen-components"]
+	path = Assets/Plugins/Submodules/unity-sensen-components
+	url = https://github.com/HugoLnx/unity-sensen-components.git
+	branch = dev
+[submodule "Assets/Plugins/Submodules/unity-sensen-toolkit"]
+	path = Assets/Plugins/Submodules/unity-sensen-toolkit
+	url = https://github.com/HugoLnx/unity-sensen-toolkit.git
+	branch = dev
