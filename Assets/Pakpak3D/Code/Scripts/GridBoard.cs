@@ -13,6 +13,8 @@ namespace Pakpak3D
         [SerializeField] private int _cellCountY = 36;
         [SerializeField] private int _cellCountHeight = 5;
 
+        public float CellSize => _cellSize;
+
         private Vector3? _origin;
         private Vector3 Origin => _origin ??= transform.position
                 + Vector3.up * (transform.localScale.y * 0.5f + _cellSize * 0.5f)

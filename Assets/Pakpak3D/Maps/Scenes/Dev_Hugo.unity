@@ -598,6 +598,7 @@ GameObject:
   - component: {fileID: 1814452078}
   - component: {fileID: 1814452080}
   - component: {fileID: 1814452079}
+  - component: {fileID: 1814452081}
   m_Layer: 0
   m_Name: Pakpak
   m_TagString: Untagged
@@ -769,6 +770,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8a3c9316f918ef488f96718970db0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1814452081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1814452070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 762b8948ccac2d241a362d2a1d336e3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _grid: {fileID: 1136458001}
+  _jumpSpeed: 5
+  _topHeightDuration: 0.5
 --- !u!1 &1822654574
 GameObject:
   m_ObjectHideFlags: 0

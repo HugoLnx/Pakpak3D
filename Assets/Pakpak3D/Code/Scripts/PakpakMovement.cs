@@ -9,17 +9,20 @@ namespace Pakpak3D
     {
         private PakpakControls _controls;
         private GridMovement _movement;
+        private GridJump _jump;
 
         [LnxInit]
-        private void Init(PakpakControls controls, GridMovement movement)
+        private void Init(PakpakControls controls, GridMovement movement, GridJump jump)
         {
             this._controls = controls;
             this._movement = movement;
+            this._jump = jump;
         }
 
         private void Start()
         {
             this._controls.OnTurn += this._movement.TurnTo;
+            this._controls.OnJump += this._jump.Jump;
         }
     }
 }

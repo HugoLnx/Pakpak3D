@@ -100,7 +100,7 @@ namespace Pakpak3D
 
         private void TranslateBy(Vector2 offset)
         {
-            _rbody.MovePosition(_rbody.position + offset.X0Y());
+            _rbody.position += offset.X0Y();
         }
     }
 }
