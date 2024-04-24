@@ -15,6 +15,7 @@ namespace Pakpak3D
         private Vector2 _inputDirection = Vector2.down;
         private Vector2? _targetPosition;
         private bool _isMoving;
+        private bool _isBlocked;
 
         [LnxInit]
         private void Init(Rigidbody rbody)
@@ -30,7 +31,7 @@ namespace Pakpak3D
 
         private void FixedUpdate()
         {
-            if (!_isMoving) return;
+            if (!_isMoving || _isBlocked) return;
             if (!_targetPosition.HasValue) UpdateTarget();
             Vector2 toTarget = _targetPosition.Value - _rbody.position.XZ();
             float targetDistance = toTarget.magnitude;
@@ -44,17 +45,27 @@ namespace Pakpak3D
                 UpdateTarget();
             }
 
+            if (!_isMoving || _isBlocked) return;
             TranslateBy(targetDirection * step);
         }
 
         public void TurnTo(Vector2 direction)
         {
             _inputDirection = direction;
+            _isBlocked = false;
         }
 
         private void UpdateTarget()
         {
             Vector3 currentPosition = _rbody.position;
+            _isBlocked = !_grid.CanMoveTowards(currentPosition, _inputDirection.AsVector2Int());
+            if (_isBlocked)
+            {
+                Debug.Log($"IsBlocked. from:{currentPosition} dir:{_inputDirection}");
+                _targetPosition = null;
+                return;
+            }
+
             Vector2Int currentCell = _grid.GetClosestCell(currentPosition).XY();
             Vector2Int targetCell = currentCell + _inputDirection.AsVector2Int();
             _targetPosition = _grid.Cell2DToPosition(targetCell);

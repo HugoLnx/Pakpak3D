@@ -12,11 +12,16 @@ namespace Pakpak3D
         [SerializeField] private int _cellCountX = 28;
         [SerializeField] private int _cellCountY = 36;
         [SerializeField] private int _cellCountHeight = 5;
+
         private Vector3? _origin;
         private Vector3 Origin => _origin ??= transform.position
                 + Vector3.up * (transform.localScale.y * 0.5f + _cellSize * 0.5f)
                 + Vector3.right * -(_cellSize * 0.5f * ((_cellCountX + 1) % 2))
                 + Vector3.forward * -(_cellSize * 0.5f * ((_cellCountY + 1) % 2));
+
+        private int ObstacleLayerMask => _obstacleLayerMask ??= LayerMask.GetMask("Obstacle");
+        private int? _obstacleLayerMask;
+
 
         private void Start()
         {
@@ -41,6 +46,24 @@ namespace Pakpak3D
         public Vector2 Cell2DToPosition(Vector2Int cell2d)
         {
             return Cell3DToPosition(cell2d.XY0()).XZ();
+        }
+
+        public bool CanMoveTowards(Vector3 position, Vector2Int direction)
+        {
+            Vector3Int originCell = GetClosestCell(position);
+            Vector3Int targetCell = originCell + direction.XY0();
+            Vector3 originPosition = Cell3DToPosition(originCell);
+            Vector3 targetPosition = Cell3DToPosition(targetCell);
+
+            bool hitObstacle = Physics.Raycast(
+                origin: originPosition,
+                direction: targetPosition - originPosition,
+                hitInfo: out RaycastHit hit,
+                maxDistance: Vector3.Distance(originPosition, targetPosition),
+                layerMask: ObstacleLayerMask
+            );
+
+            return !hitObstacle;
         }
 
         private void OnDrawGizmos()

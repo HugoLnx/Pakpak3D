@@ -9,7 +9,6 @@ namespace Pakpak3D
         public event Action<Vector2> OnTurn;
         public event Action OnJump;
         private GameInputActions _input;
-        private Vector2 _direction;
         private bool _wasEqual;
         private Vector2 _intentDirection;
 
