@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using LnxArch;
@@ -16,6 +17,8 @@ namespace Pakpak3D
         private Vector2? _targetPosition;
         private bool _isMoving;
         private bool _isBlocked;
+        private bool CanNotMove => _isBlocked || !_isMoving;
+        private bool HasTarget => _targetPosition.HasValue;
 
         [LnxInit]
         private void Init(Rigidbody rbody)
@@ -31,32 +34,32 @@ namespace Pakpak3D
 
         private void FixedUpdate()
         {
-            if (!_isMoving || _isBlocked) return;
-            if (!_targetPosition.HasValue) UpdateTarget();
-            Vector2 toTarget = _targetPosition.Value - _rbody.position.XZ();
-            float targetDistance = toTarget.magnitude;
-            Vector2 targetDirection = toTarget / targetDistance;
-            float step = _speed * Time.fixedDeltaTime;
+            if (CanNotMove) return;
 
-            if (step > targetDistance)
+            float step = _speed * Time.fixedDeltaTime;
+            UpdateTarget();
+            while (HasTarget && step > 0)
             {
-                TranslateBy(toTarget);
-                step -= targetDistance;
+                step = ConsumeStepTowardsTargetBy(step);
                 UpdateTarget();
             }
-
-            if (!_isMoving || _isBlocked) return;
-            TranslateBy(targetDirection * step);
         }
 
         public void TurnTo(Vector2 direction)
         {
+            if (direction == Vector2.zero)
+            {
+                Debug.LogWarning($"!!! TurnTo: zero direction");
+                return;
+            }
             _inputDirection = direction;
             _isBlocked = false;
         }
 
         private void UpdateTarget()
         {
+            if (HasTarget) return;
+
             Vector3 currentPosition = _rbody.position;
             _isBlocked = !_grid.CanMoveTowards(currentPosition, _inputDirection.AsVector2Int());
             if (_isBlocked)
@@ -67,8 +70,32 @@ namespace Pakpak3D
             }
 
             Vector2Int currentCell = _grid.GetClosestCell(currentPosition).XY();
-            Vector2Int targetCell = currentCell + _inputDirection.AsVector2Int();
+            Vector2Int cellDirection = _inputDirection.AsVector2Int();
+            Vector2Int targetCell = currentCell + cellDirection;
             _targetPosition = _grid.Cell2DToPosition(targetCell);
+        }
+
+        private float ConsumeStepTowardsTargetBy(float step)
+        {
+            if (!HasTarget || CanNotMove) return 0;
+            Vector2 toTarget = _targetPosition.Value - _rbody.position.XZ();
+            float targetDistance = toTarget.magnitude;
+
+            float remainingStep = 0;
+            if (step >= targetDistance)
+            {
+                TranslateBy(toTarget);
+                _targetPosition = null;
+                remainingStep = step - targetDistance;
+            }
+            else
+            {
+                Vector2 targetDirection = toTarget / targetDistance;
+                TranslateBy(targetDirection * step);
+                remainingStep = 0;
+            }
+
+            return remainingStep;
         }
 
         private void TranslateBy(Vector2 offset)
