@@ -23,6 +23,7 @@ namespace Pakpak3D
         {
             this._controls.OnTurn += this._movement.TurnTo;
             this._controls.OnJump += this._jump.Jump;
+            this._movement.OnSnapInCell += (_) => this._jump.Fall();
         }
     }
 }

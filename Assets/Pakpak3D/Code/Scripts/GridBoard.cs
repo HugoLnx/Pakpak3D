@@ -50,22 +50,62 @@ namespace Pakpak3D
             return Cell3DToPosition(cell2d.XY0()).XZ();
         }
 
+        // TODO: Remove this logic from GridBoard because each object must have it's own buffer
+        private Vector3[] _rayMoveOriginsBuffer = new Vector3[4];
         public bool CanMoveTowards(Vector3 position, Vector2Int direction)
         {
             Vector3Int originCell = GetClosestCell(position);
-            Vector3Int targetCell = originCell + direction.XY0();
             Vector3 originPosition = Cell3DToPosition(originCell);
-            Vector3 targetPosition = Cell3DToPosition(targetCell);
+            Vector3 moveDirection = direction.X0Y().AsVector3Float();
+            Vector3 transversal = Vector3.Cross(moveDirection, Vector3.up).normalized;
 
-            bool hitObstacle = Physics.Raycast(
-                origin: originPosition,
-                direction: targetPosition - originPosition,
-                hitInfo: out RaycastHit hit,
-                maxDistance: Vector3.Distance(originPosition, targetPosition),
-                layerMask: ObstacleLayerMask
-            );
+            _rayMoveOriginsBuffer[0] = originPosition + ((_cellSize * 0.5f - 0.001f) * Vector3.up);
+            _rayMoveOriginsBuffer[1] = originPosition + ((_cellSize * 0.5f - 0.001f) * Vector3.down);
+            _rayMoveOriginsBuffer[2] = originPosition + ((_cellSize * 0.5f - 0.001f) * transversal);
+            _rayMoveOriginsBuffer[3] = originPosition + ((_cellSize * 0.5f - 0.001f) * -transversal);
 
-            return !hitObstacle;
+            for (int i = 0; i < _rayMoveOriginsBuffer.Length; i++)
+            {
+                Vector3 origin = _rayMoveOriginsBuffer[i];
+                bool hitObstacle = Physics.Raycast(
+                    origin: origin,
+                    direction: moveDirection,
+                    hitInfo: out RaycastHit hit,
+                    maxDistance: _cellSize * 0.75f,
+                    layerMask: ObstacleLayerMask
+                );
+                if (hitObstacle) return false;
+            }
+
+            return true;
+        }
+
+        // TODO: Remove this logic from GridBoard because each object must have it's own buffer
+        private Vector3[] _rayFallOriginsBuffer = new Vector3[4];
+        public bool CanFall(Vector3 position)
+        {
+            Vector3Int originCell = GetClosestCell(position);
+            Vector3 originPosition = Cell3DToPosition(originCell) + ((_cellSize * 0.5f - 0.1f) * Vector3.down);
+
+            _rayFallOriginsBuffer[0] = originPosition + ((_cellSize * 0.5f - 0.001f) * Vector3.right);
+            _rayFallOriginsBuffer[1] = originPosition + ((_cellSize * 0.5f - 0.001f) * Vector3.left);
+            _rayFallOriginsBuffer[2] = originPosition + ((_cellSize * 0.5f - 0.001f) * Vector3.forward);
+            _rayFallOriginsBuffer[3] = originPosition + ((_cellSize * 0.5f - 0.001f) * Vector3.back);
+
+            for (int i = 0; i < _rayFallOriginsBuffer.Length; i++)
+            {
+                Vector3 origin = _rayFallOriginsBuffer[i];
+                bool hitObstacle = Physics.Raycast(
+                    origin: origin,
+                    direction: Vector3.down,
+                    hitInfo: out RaycastHit hit,
+                    maxDistance: 0.25f,
+                    layerMask: ObstacleLayerMask
+                );
+                if (hitObstacle) return false;
+            }
+
+            return true;
         }
 
         private void OnDrawGizmos()
