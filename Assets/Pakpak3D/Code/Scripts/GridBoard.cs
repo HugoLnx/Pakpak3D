@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using SensenToolkit;
@@ -113,21 +114,56 @@ namespace Pakpak3D
             _origin = null;
             using (Gizmosx.Color(Color.red))
             {
-                int minCellX = -Mathf.CeilToInt(_cellCountX / 2f - 1);
-                int maxCellX = _cellCountX / 2;
-                int minCellY = -Mathf.CeilToInt(_cellCountY / 2f - 1);
-                int maxCellY = _cellCountY / 2;
-                for (int cellX = minCellX; cellX <= maxCellX; cellX++)
+                if (_cellCountHeight == 0)
                 {
-                    for (int cellY = minCellY; cellY <= maxCellY; cellY++)
-                    {
-                        for (int cellZ = 0; cellZ < _cellCountHeight; cellZ++)
-                        {
-                            Vector3Int cell3d = new(cellX, cellY, cellZ);
-                            Vector3 center = Cell3DToPosition(cell3d);
-                            Gizmos.DrawWireCube(center, Vector3.one * _cellSize);
-                        }
-                    }
+                    DrawFloorGizmos();
+                }
+                else
+                {
+                    DrawLayeredCubeGizmos();
+                }
+            }
+        }
+
+        private void DrawFloorGizmos()
+        {
+            ForEachCell2D((cell2d) =>
+            {
+                int cellX = cell2d.x;
+                int cellY = cell2d.y;
+                Vector3Int cell3d = new(cellX, cellY, 0);
+                Vector3 center = Cell3DToPosition(cell3d)
+                    + Vector3.down * (_cellSize * 0.5f);
+                Gizmos.DrawWireCube(center, new Vector3(_cellSize, 0.1f, _cellSize));
+            });
+        }
+
+        private void DrawLayeredCubeGizmos()
+        {
+            for (int cellZ = 0; cellZ < _cellCountHeight; cellZ++)
+            {
+                ForEachCell2D((cell2d) =>
+                {
+                    int cellX = cell2d.x;
+                    int cellY = cell2d.y;
+                    Vector3Int cell3d = new(cellX, cellY, cellZ);
+                    Vector3 center = Cell3DToPosition(cell3d);
+                    Gizmos.DrawWireCube(center, Vector3.one * _cellSize);
+                });
+            }
+        }
+
+        private void ForEachCell2D(System.Action<Vector2Int> action)
+        {
+            int minCellX = -Mathf.CeilToInt(_cellCountX / 2f - 1);
+            int maxCellX = _cellCountX / 2;
+            int minCellY = -Mathf.CeilToInt(_cellCountY / 2f - 1);
+            int maxCellY = _cellCountY / 2;
+            for (int cellX = minCellX; cellX <= maxCellX; cellX++)
+            {
+                for (int cellY = minCellY; cellY <= maxCellY; cellY++)
+                {
+                    action(new Vector2Int(cellX, cellY));
                 }
             }
         }
