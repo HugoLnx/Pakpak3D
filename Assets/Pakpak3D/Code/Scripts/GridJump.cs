@@ -107,7 +107,7 @@ namespace Pakpak3D
                 y: cellPosition.y,
                 z: _rbody.position.z
             );
-            Debug.Log($"HasSomethingBellow from: {position}");
+            // Debug.Log($"HasSomethingBellow from: {position}");
             return !_grid.CanFall(position);
         }
 
@@ -122,7 +122,7 @@ namespace Pakpak3D
                 y: cellPosition.y,
                 z: targetPosition.y
             );
-            Debug.Log($"HasSomethingBellowMovementTarget from:{position}");
+            // Debug.Log($"HasSomethingBellowMovementTarget from:{position}");
             return !_grid.CanFall(position);
         }
     }

@@ -71,7 +71,7 @@ namespace Pakpak3D
             _isBlocked = !_grid.CanMoveTowards(currentPosition, _inputDirection.AsVector2Int());
             if (_isBlocked)
             {
-                Debug.Log($"IsBlocked. from:{currentPosition} dir:{_inputDirection}");
+                // Debug.Log($"IsBlocked. from:{currentPosition} dir:{_inputDirection}");
                 _targetPosition = null;
                 return;
             }
