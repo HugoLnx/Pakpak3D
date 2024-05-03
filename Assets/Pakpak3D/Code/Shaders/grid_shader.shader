@@ -3,8 +3,9 @@ Shader "Unlit/GridShader"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _TexBorderUVSize ("Texture Border UV Size", Float) = 0.4
-        _RenderBorderWSSize ("Rendering Border WS Size", Float) = 0.1
+        _BorderSizeTexUVS ("Border Size in Texture UV", Float) = 0.4
+        _BorderSizeWS ("Border Size in World Space", Float) = 0.1
+        _LoopScale ("Scale Texture Looping Area", Float) = 1
         _Size ("Size", Vector) = (10, 1, 5, 0)
     }
     SubShader
@@ -34,8 +35,9 @@ Shader "Unlit/GridShader"
             sampler2D _MainTex;
             float4 _MainTex_ST;
             float4 _Size;
-            float _TexBorderUVSize;
-            float _RenderBorderWSSize;
+            float _BorderSizeTexUVS;
+            float _BorderSizeWS;
+            float _LoopScale;
 
             int stepBetween(float minEdge, float maxEdge, float value) {
                 return step(minEdge, value) * step(value, maxEdge);
@@ -79,7 +81,7 @@ Shader "Unlit/GridShader"
                 float2 uv2 : TEXCOORD0;
                 // UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
-                float2 sizeUvS : TEXCOORD1;
+                float2 sizeWS : TEXCOORD1;
                 // float3 normal : TEXCOORD1;
                 // float3 tangent : TANGENT;
                 // float3 bitangent : TEXCOORD2;
@@ -100,38 +102,83 @@ Shader "Unlit/GridShader"
                 float3 size = _Size.xyz;
 
                 float3x3 rotationToUvSpace = float3x3(tangent, bitangent, normal);
-                o.sizeUvS = abs(mul(rotationToUvSpace, size).xy);
+                o.sizeWS = abs(mul(rotationToUvSpace, size).xy);
                 return o;
             }
 
-                // float3 vec = float3(sizeUvS, 0);
+            float VecMax(float2 vec) {
+                return max(vec.x, vec.y);
+            }
+
+            float VecMin(float2 vec) {
+                return min(vec.x, vec.y);
+            }
+
+            int IsNot(int v) { return 1 - v; }
+            int2 IsNot(int2 v) { return 1 - v; }
+            int And(int a, int b) { return a * b; }
+            int And(int a, int b, int c) { return a * b * c; }
+            int2 And(int2 a, int2 b) { return a * b; }
+            int2 And(int2 a, int2 b, int2 c) { return a * b * c; }
+            int Or(int a, int b) { return max(a, b); }
+            int Or(int a, int b, int c) { return max(max(a, b), c); }
+            int2 Or(int2 a, int2 b) { return max(a, b); }
+            int2 Or(int2 a, int2 b, int2 c) { return max(max(a, b), c); }
+            int Xor(int a, int b) { return (a - b) * (a - b); }
+            int2 Xor(int2 a, int2 b) { return (a - b) * (a - b); }
+
+                // float3 vec = float3(sizeWS, 0);
                 // float3 testVec = ToTestVec(vec);
                 // return float4(testVec, 1);
 
             fixed4 frag (v2f i) : SV_Target
             {
                 float2 uv2 = i.uv2;
-                float2 sizeUvS = i.sizeUvS;
-                float2 halfSizeUvS = sizeUvS * 0.5;
+                float2 sizeWS = i.sizeWS;
+                float2 halfSizeWS = sizeWS * 0.5;
 
                 // Calculate base variables
-                float centerUvDist =  max(abs(uv2.x), abs(uv2.y));
-                float edgeUvDist = 0.5 - centerUvDist;
+                float2 uv2WS = uv2 * sizeWS;
+                float2 uv2AbsWS = abs(uv2WS);
+                float2 borderLimitWS = halfSizeWS - _BorderSizeWS;
+                float2 borderLimitTexUV = 0.5 - _BorderSizeTexUVS;
+                float2 wsToTexUv2 = _BorderSizeTexUVS / _BorderSizeWS;
+                float2 texSizeWS = _BorderSizeWS / _BorderSizeTexUVS;
+                float2 halfTexSizeWS = texSizeWS * 0.5;
+                // float2 texUv2 = (abs(uv2WS) - borderLimitWS) * wsToTexUv2 * sign(uv2WS);
+                int2 isBorder = step(borderLimitWS, uv2AbsWS);
+                int2 isNotBorder = IsNot(isBorder);
+                float2 texUv2 = 0;
 
-                float2 centerDistWS2d = abs(uv2 * sizeUvS);
-                float2 edgeDistWS2d = halfSizeUvS - centerDistWS2d;
-                float edgeDistWS = min(edgeDistWS2d.x, edgeDistWS2d.y);
+                float2 borderTexUvInx = (uv2AbsWS - borderLimitWS) / _BorderSizeWS;
+                texUv2 += isBorder * lerp(borderLimitTexUV, 0.5, borderTexUvInx) * sign(uv2WS);
 
-                // Detect border or middle
-                int isBorder = step(edgeDistWS, _RenderBorderWSSize);
-                int isMiddle = 1 - isBorder;
+                float2 middleTexSizeWS = (texSizeWS - _BorderSizeWS * 2);
+                float2 middleTexUvInx = fmod((uv2WS + halfSizeWS - _BorderSizeWS) * _LoopScale, middleTexSizeWS) / middleTexSizeWS;
+                texUv2 += isNotBorder * lerp(-borderLimitTexUV, borderLimitTexUV, middleTexUvInx);
 
+                // // Detect border or middle
+                // int isBorder = step(edgeDistWS, _BorderSizeWS);
+                // int isMiddle = 1 - isBorder;
 
-                // fixed4 col = tex2D(_MainTex, i.uv);
+                // float2 texUv2 = uv2WS * wsToTexUv2;
 
-                fixed3 col = fixed3(0, 0, 0);
-                col += isBorder * edgeUvDist * BLUE;
-                col += isMiddle * edgeUvDist * WHITE;
+                float2 texUv = texUv2 + 0.5;
+                fixed3 texCol = tex2D(_MainTex, texUv);
+
+                // int isBorderX = step(borderLimitWS.x, abs(uv2WS.x));
+                // int isBorderY = step(borderLimitWS.y, abs(uv2WS.y));
+                // int isBorder = Or(isBorderX, isBorderY);
+                int isBorderOnly = Xor(isBorder.x, isBorder.y);
+                int isBorder1d = Or(isBorder.x, isBorder.y);
+                fixed3 col = texCol;
+                // fixed3 col = BLACK;
+                // col += isBorder1d * texCol;
+                // return fixed4(texCol, 1);
+
+                // fixed3 col = fixed3(0, 0, 0);
+                // col += isBorder * edgeUvDist * BLUE;
+                // col += isMiddle * edgeUvDist * WHITE;
 
                 return fixed4(col, 1);
             }
