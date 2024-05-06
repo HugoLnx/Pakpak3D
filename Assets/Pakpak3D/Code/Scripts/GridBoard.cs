@@ -56,6 +56,22 @@ namespace Pakpak3D
             return CanMoveTowards(position, direction.X0Y());
         }
 
+        public Vector3Int? GetCellAboveFloor(Vector2Int cell2d)
+        {
+            float maxFloorHeight = _cellSize * 5f;
+            Vector3 cellSkyPosition = Cell2DToPosition(cell2d).X0Y() + Vector3.up * maxFloorHeight;
+
+            bool hitObstacle = Physics.Raycast(
+                origin: cellSkyPosition,
+                direction: Vector3.down,
+                hitInfo: out RaycastHit hit,
+                maxDistance: maxFloorHeight + _cellSize,
+                layerMask: ObstacleLayerMask
+            );
+            if (!hitObstacle) return null;
+            return GetClosestCell(hit.point + Vector3.up * (_cellSize * 0.5f));
+        }
+
         // TODO: Remove this logic from GridBoard because each object must have it's own buffer
         private Vector3[] _rayMoveOriginsBuffer = new Vector3[4];
         public bool CanMoveTowards(Vector3 position, Vector3Int direction)

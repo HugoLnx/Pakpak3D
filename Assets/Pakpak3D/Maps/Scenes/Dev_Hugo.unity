@@ -3551,6 +3551,7 @@ GameObject:
   - component: {fileID: 1136457998}
   - component: {fileID: 1136458001}
   - component: {fileID: 1136458002}
+  - component: {fileID: 1136458004}
   m_Layer: 6
   m_Name: GridBase
   m_TagString: Untagged
@@ -3672,6 +3673,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cfd594d1d68ca24d8e40f230bf82c8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1136458004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1136457996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19d290b0a75919a4aba53088159e0da2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _root: {fileID: 0}
 --- !u!1 &1168658725
 GameObject:
   m_ObjectHideFlags: 0
@@ -5698,8 +5712,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b7a55411ef67d442b0fb32c0a82aa3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _initialDirection: {x: 0, y: 1}
-  _snapsToSwitchDirection: 16
+  _grid: {fileID: 1136458001}
+  _target: {fileID: 1814452074}
 --- !u!114 &1686962276
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -12,6 +12,10 @@ namespace Pakpak3D
         [SerializeField] private GridBoard _grid;
         private Grid3DMovement _movement;
         private Vector2Int _targetDirection;
+
+        public Vector3 Position => _movement.Position;
+
+
         public event Action<Vector3Int> OnSnapInCell;
 
         [LnxInit]
