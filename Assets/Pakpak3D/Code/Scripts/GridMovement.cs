@@ -15,6 +15,7 @@ namespace Pakpak3D
         private Rigidbody _rbody;
         private MovingPhysics _movingPhysics;
         private Vector2 _inputDirection = Vector2.down;
+        private Vector2? _targetDirection;
         private Vector2? _targetPosition;
         private bool _isMoving;
         private bool _isBlocked;
@@ -22,8 +23,17 @@ namespace Pakpak3D
         private Vector3 Position => _movingPhysics.PositionPreview;
         public bool HasTarget => _targetPosition.HasValue;
         public Vector2? Target => _targetPosition;
+        public Vector2Int? CellDirection
+        {
+            get
+            {
+                if (!HasTarget) return null;
+                return _targetDirection.Value.AsVector2Int();
+            }
+        }
 
         public event Action<Vector2Int> OnSnapInCell;
+        public event Action<Vector2?> OnUpdateTarget;
 
         [LnxInit]
         private void Init(Rigidbody rbody, MovingPhysics movingPhysics)
@@ -73,6 +83,8 @@ namespace Pakpak3D
             {
                 // Debug.Log($"IsBlocked. from:{currentPosition} dir:{_inputDirection}");
                 _targetPosition = null;
+                _targetDirection = null;
+                OnUpdateTarget?.Invoke(null);
                 return;
             }
 
@@ -80,6 +92,8 @@ namespace Pakpak3D
             Vector2Int cellDirection = _inputDirection.AsVector2Int();
             Vector2Int targetCell = currentCell + cellDirection;
             _targetPosition = _grid.Cell2DToPosition(targetCell);
+            _targetDirection = _inputDirection;
+            OnUpdateTarget?.Invoke(_targetPosition);
             // Debug.Log($"Target Selected cell:{targetCell} pos:{_targetPosition}");
         }
 

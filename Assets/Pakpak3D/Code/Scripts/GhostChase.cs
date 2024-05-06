@@ -18,8 +18,10 @@ namespace Pakpak3D
         };
         [SerializeField] private GridBoard _grid;
         [SerializeField] private GridPathfinding _pathfinding;
-        [SerializeField] private Transform _target;
-        private Transform MainTarget => _target;
+        [SerializeField] private Transform _mainTarget;
+        [SerializeField] private Transform _preferredWaypoint;
+        [SerializeField] private float _minDistanceToIgnoreWaypoint = 1f;
+        private Vector3 _currentTargetPosition;
         private Vector2Int _direction;
         private FlyingMover _flying;
 
@@ -44,7 +46,7 @@ namespace Pakpak3D
 
         private void UpdateDirection()
         {
-
+            UpdateCurrentTargetPosition();
             Vector3 position = _flying.Position;
             HashSet<Vector2Int> validDirections = GetAllNonBlockedDirectionsFrom(position);
             Vector2Int backwardsDirection = -_direction;
@@ -69,7 +71,7 @@ namespace Pakpak3D
 
             Vector2 targetDirection = navmeshDirection.HasValue
                 ? navmeshDirection.Value
-                : (MainTarget.position - _flying.Position).XZ().normalized;
+                : (_currentTargetPosition - _flying.Position).XZ().normalized;
 
             return directions
                 .OrderBy(d => Vector2.Angle(d, targetDirection))
@@ -78,7 +80,7 @@ namespace Pakpak3D
 
         private Vector2? GetDirectionFromPathfinding()
         {
-            Vector2Int targetCell2d = _grid.GetClosestCell(MainTarget.position).XZ();
+            Vector2Int targetCell2d = _grid.GetClosestCell(_currentTargetPosition).XZ();
             Vector2? chosen = TryPathfindingTo(targetCell2d);
             if (chosen.HasValue)
             {
@@ -139,6 +141,65 @@ namespace Pakpak3D
         {
             _direction = direction;
             _flying.TurnTo(direction);
+        }
+
+        private void UpdateCurrentTargetPosition()
+        {
+            _currentTargetPosition = GetCurrentTargetPosition();
+
+        }
+
+        private Vector3 GetCurrentTargetPosition()
+        {
+            if (_preferredWaypoint == null)
+            {
+                Debug.Log($"No preferred waypoint. Using main target: {_mainTarget.position}");
+                return _mainTarget.position;
+            }
+
+            Vector2 targetPosition = _mainTarget.position.XZ();
+            Vector2 waypointPosition = _preferredWaypoint.position.XZ();
+            Vector2 myPosition = _flying.Position.XZ();
+
+            float distanceToWaypoint = Vector2.Distance(myPosition, waypointPosition);
+            if (distanceToWaypoint <= _minDistanceToIgnoreWaypoint)
+            {
+                Debug.Log($"Distance to waypoint: {distanceToWaypoint} <= {_minDistanceToIgnoreWaypoint}. Ignoring waypoint.");
+                return _mainTarget.position;
+            }
+
+            bool isWithinSegmentLimits = CalcDistanceFromSegmentToPoint(
+                segmentStart: targetPosition,
+                segmentEnd: waypointPosition,
+                point: myPosition,
+                out float segmentDistance
+            );
+
+            if (!isWithinSegmentLimits
+                || segmentDistance <= _minDistanceToIgnoreWaypoint)
+            {
+                Debug.Log($"Distance to waypoint SEGMENT: {segmentDistance} <= {_minDistanceToIgnoreWaypoint}. Ignoring waypoint.");
+                return _mainTarget.position;
+            }
+
+            Debug.Log($"Using waypoint: {waypointPosition}. segmentDistance:{segmentDistance} isWithinSegmentLimits:{isWithinSegmentLimits}");
+            return _preferredWaypoint.position;
+        }
+
+        private bool CalcDistanceFromSegmentToPoint(Vector2 segmentStart, Vector2 segmentEnd, Vector2 point, out float distance)
+        {
+            Vector2 segment = segmentEnd - segmentStart;
+            Vector2 startToPoint = point - segmentStart;
+            float segmentLength = segment.magnitude;
+            Vector2 segmentDirection = segment / segmentLength;
+            float projectionPointToSegment = Vector2.Dot(segmentDirection, startToPoint);
+            bool isProjectionWithinSegmentLimits = projectionPointToSegment >= 0 && projectionPointToSegment <= segmentLength;
+
+            Vector2 intersectionPoint = segmentDirection * projectionPointToSegment;
+            float distanceToSegment = (intersectionPoint - startToPoint).magnitude;
+            distance = distanceToSegment;
+
+            return isProjectionWithinSegmentLimits;
         }
     }
 }
