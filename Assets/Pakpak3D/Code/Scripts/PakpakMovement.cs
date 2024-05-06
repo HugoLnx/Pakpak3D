@@ -1,12 +1,15 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using LnxArch;
+using SensenToolkit;
 using UnityEngine;
 
 namespace Pakpak3D
 {
     public class PakpakMovement : MonoBehaviour
     {
+        [SerializeField] private Transform _skin;
         private PakpakControls _controls;
         private GridMovement _movement;
         private GridJump _jump;
@@ -14,16 +17,23 @@ namespace Pakpak3D
         [LnxInit]
         private void Init(PakpakControls controls, GridMovement movement, GridJump jump)
         {
-            this._controls = controls;
-            this._movement = movement;
-            this._jump = jump;
+            _controls = controls;
+            _movement = movement;
+            _jump = jump;
+
+            _controls.OnTurn += _movement.TurnTo;
+            _controls.OnJump += _jump.Jump;
+            _movement.OnSnapInCell += (_) => _jump.Fall();
+            _movement.OnUpdateTarget += UpdateTargetCallback;
         }
 
-        private void Start()
+        private void UpdateTargetCallback(Vector2? targetPosition2d)
         {
-            this._controls.OnTurn += this._movement.TurnTo;
-            this._controls.OnJump += this._jump.Jump;
-            this._movement.OnSnapInCell += (_) => this._jump.Fall();
+            if (!_movement.HasTarget) return;
+            Vector2Int? direction = _movement.CellDirection;
+            Vector3 forwardDirection = direction.Value.AsVector2Float().X0Y().normalized;
+            Debug.Log($"UpdateTargetCallback: {targetPosition2d} {direction} {forwardDirection}");
+            _skin.forward = forwardDirection;
         }
     }
 }

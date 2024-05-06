@@ -15,6 +15,7 @@ namespace Pakpak3D
         private Rigidbody _rbody;
         private MovingPhysics _movingPhysics;
         private Vector2 _inputDirection = Vector2.down;
+        private Vector2? _targetDirection;
         private Vector2? _targetPosition;
         private bool _isMoving;
         private bool _isBlocked;
@@ -22,8 +23,17 @@ namespace Pakpak3D
         private Vector3 Position => _movingPhysics.PositionPreview;
         public bool HasTarget => _targetPosition.HasValue;
         public Vector2? Target => _targetPosition;
+        public Vector2Int? CellDirection
+        {
+            get
+            {
+                if (!HasTarget) return null;
+                return _targetDirection.Value.AsVector2Int();
+            }
+        }
 
         public event Action<Vector2Int> OnSnapInCell;
+        public event Action<Vector2?> OnUpdateTarget;
 
         [LnxInit]
         private void Init(Rigidbody rbody, MovingPhysics movingPhysics)
@@ -68,18 +78,22 @@ namespace Pakpak3D
             if (HasTarget) return;
 
             Vector3 currentPosition = this.Position;
-            _isBlocked = !_grid.CanMoveTowards(currentPosition, _inputDirection.AsVector2Int());
+            _isBlocked = !_grid.CanMoveTowards2D(currentPosition, _inputDirection.AsVector2Int());
             if (_isBlocked)
             {
                 // Debug.Log($"IsBlocked. from:{currentPosition} dir:{_inputDirection}");
                 _targetPosition = null;
+                _targetDirection = null;
+                OnUpdateTarget?.Invoke(null);
                 return;
             }
 
-            Vector2Int currentCell = _grid.GetClosestCell(currentPosition).XY();
+            Vector2Int currentCell = _grid.GetClosestCell(currentPosition).XZ();
             Vector2Int cellDirection = _inputDirection.AsVector2Int();
             Vector2Int targetCell = currentCell + cellDirection;
             _targetPosition = _grid.Cell2DToPosition(targetCell);
+            _targetDirection = _inputDirection;
+            OnUpdateTarget?.Invoke(_targetPosition);
             // Debug.Log($"Target Selected cell:{targetCell} pos:{_targetPosition}");
         }
 
@@ -95,7 +109,7 @@ namespace Pakpak3D
                 TranslateBy(toTarget);
                 _targetPosition = null;
                 remainingStep = step - targetDistance;
-                OnSnapInCell?.Invoke(_grid.GetClosestCell(this.Position).XY());
+                OnSnapInCell?.Invoke(_grid.GetClosestCell(this.Position).XZ());
             }
             else
             {
@@ -112,18 +126,18 @@ namespace Pakpak3D
             this._movingPhysics.TranslateBy(offset.X0Y());
         }
 
-        private WaitForSeconds WaitCheckThrottling = new(0.35f);
-        private WaitForFixedUpdate WaitFixedUpdate = new();
-        private WaitForEndOfFrame WaitFrame = new();
+        private readonly WaitForSeconds _waitCheckThrottling = new(0.35f);
+        private readonly WaitForFixedUpdate _waitFixedUpdate = new();
+        private readonly WaitForEndOfFrame _waitFrame = new();
         private IEnumerator FixIfFrozen()
         {
             while (true)
             {
-                yield return WaitCheckThrottling;
+                yield return _waitCheckThrottling;
                 if (!HasTarget) continue;
                 Vector3 lastPosition = this.transform.position;
-                yield return WaitFixedUpdate;
-                yield return WaitFrame;
+                yield return _waitFixedUpdate;
+                yield return _waitFrame;
                 if (lastPosition == this.transform.position && HasTarget)
                 {
                     Debug.LogWarning($"FixIfFrozen: {lastPosition}");

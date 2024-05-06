@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: grid_shader_material
+  m_Name: SlicedBlockMaterial
   m_Shader: {fileID: 4800000, guid: 28b4807c8f37b2c47b97ef1ef648cdcc, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -24,13 +24,13 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: d2ebb83124e6982429e86ee6aa3a36ed, type: 3}
+        m_Texture: {fileID: 2800000, guid: e8e87b45e9072e64995b8ce7e3dfe7ef, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _BorderSizeTexUVS: 0.1
-    - _BorderSizeWS: 0.1
+    - _BorderSizeWS: 0.05
     - _LoopScale: 1
     - _RenderBorderWSSize: 0.15
     - _TexBorderUVSize: 0.1

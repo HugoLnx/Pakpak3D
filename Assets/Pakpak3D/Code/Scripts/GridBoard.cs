@@ -11,7 +11,7 @@ namespace Pakpak3D
     {
         [SerializeField] private float _cellSize = 1f;
         [SerializeField] private int _cellCountX = 28;
-        [SerializeField] private int _cellCountY = 36;
+        [SerializeField] private int _cellCountZ = 36;
         [SerializeField] private int _cellCountHeight = 5;
 
         public float CellSize => _cellSize;
@@ -20,7 +20,7 @@ namespace Pakpak3D
         private Vector3 Origin => _origin ??= transform.position
                 + Vector3.up * (transform.localScale.y * 0.5f + _cellSize * 0.5f)
                 + Vector3.right * -(_cellSize * 0.5f * ((_cellCountX + 1) % 2))
-                + Vector3.forward * -(_cellSize * 0.5f * ((_cellCountY + 1) % 2));
+                + Vector3.forward * -(_cellSize * 0.5f * ((_cellCountZ + 1) % 2));
 
         private int ObstacleLayerMask => _obstacleLayerMask ??= LayerMask.GetMask("Obstacle");
         private int? _obstacleLayerMask;
@@ -36,34 +36,61 @@ namespace Pakpak3D
             Vector3 originToCell = position - Origin;
             return new Vector3Int(
                 x: Mathf.RoundToInt(originToCell.x / _cellSize),
-                y: Mathf.RoundToInt(originToCell.z / _cellSize),
-                z: Mathf.RoundToInt(originToCell.y / _cellSize)
+                y: Mathf.RoundToInt(originToCell.y / _cellSize),
+                z: Mathf.RoundToInt(originToCell.z / _cellSize)
             );
         }
 
         public Vector3 Cell3DToPosition(Vector3Int cell3d)
         {
-            return Origin + cell3d.XZY().AsVector3Float() * _cellSize;
+            return Origin + cell3d.AsVector3Float() * _cellSize;
         }
 
         public Vector2 Cell2DToPosition(Vector2Int cell2d)
         {
-            return Cell3DToPosition(cell2d.XY0()).XZ();
+            return Cell3DToPosition(cell2d.X0Y()).XZ();
+        }
+
+        public bool CanMoveTowards2D(Vector3 position, Vector2Int direction)
+        {
+            return CanMoveTowards(position, direction.X0Y());
+        }
+
+        public Vector3Int? GetCellAboveFloor(Vector2Int cell2d)
+        {
+            float maxFloorHeight = _cellSize * 5f;
+            Vector3 cellSkyPosition = Cell2DToPosition(cell2d).X0Y() + Vector3.up * maxFloorHeight;
+
+            bool hitObstacle = Physics.Raycast(
+                origin: cellSkyPosition,
+                direction: Vector3.down,
+                hitInfo: out RaycastHit hit,
+                maxDistance: maxFloorHeight + _cellSize,
+                layerMask: ObstacleLayerMask
+            );
+            if (!hitObstacle) return null;
+            return GetClosestCell(hit.point + Vector3.up * (_cellSize * 0.5f));
         }
 
         // TODO: Remove this logic from GridBoard because each object must have it's own buffer
         private Vector3[] _rayMoveOriginsBuffer = new Vector3[4];
-        public bool CanMoveTowards(Vector3 position, Vector2Int direction)
+        public bool CanMoveTowards(Vector3 position, Vector3Int direction)
         {
+            if (!Grid3DDirection.IsValidDirection(direction))
+            {
+                throw new ArgumentException($"Invalid direction: {direction}. It should be a normalized vector with only one non-zero component.");
+            }
             Vector3Int originCell = GetClosestCell(position);
             Vector3 originPosition = Cell3DToPosition(originCell);
-            Vector3 moveDirection = direction.X0Y().AsVector3Float();
-            Vector3 transversal = Vector3.Cross(moveDirection, Vector3.up).normalized;
+            Vector3 moveDirection = direction.AsVector3Float();
+            GetTransversals(direction, out Vector3Int transversalInt, out Vector3Int transversal2Int);
+            Vector3 transversal = transversalInt.AsVector3Float();
+            Vector3 transversal2 = transversal2Int.AsVector3Float();
 
-            _rayMoveOriginsBuffer[0] = originPosition + ((_cellSize * 0.5f - 0.001f) * Vector3.up);
-            _rayMoveOriginsBuffer[1] = originPosition + ((_cellSize * 0.5f - 0.001f) * Vector3.down);
-            _rayMoveOriginsBuffer[2] = originPosition + ((_cellSize * 0.5f - 0.001f) * transversal);
-            _rayMoveOriginsBuffer[3] = originPosition + ((_cellSize * 0.5f - 0.001f) * -transversal);
+            _rayMoveOriginsBuffer[0] = originPosition + ((_cellSize * 0.5f - 0.001f) * transversal);
+            _rayMoveOriginsBuffer[1] = originPosition + ((_cellSize * 0.5f - 0.001f) * transversal);
+            _rayMoveOriginsBuffer[2] = originPosition + ((_cellSize * 0.5f - 0.001f) * transversal2);
+            _rayMoveOriginsBuffer[3] = originPosition + ((_cellSize * 0.5f - 0.001f) * -transversal2);
 
             for (int i = 0; i < _rayMoveOriginsBuffer.Length; i++)
             {
@@ -81,35 +108,21 @@ namespace Pakpak3D
             return true;
         }
 
-        // TODO: Remove this logic from GridBoard because each object must have it's own buffer
-        private Vector3[] _rayFallOriginsBuffer = new Vector3[4];
         public bool CanFall(Vector3 position)
         {
-            Vector3Int originCell = GetClosestCell(position);
-            Vector3 originPosition = Cell3DToPosition(originCell) + ((_cellSize * 0.5f - 0.1f) * Vector3.down);
-
-            _rayFallOriginsBuffer[0] = originPosition + ((_cellSize * 0.5f - 0.001f) * Vector3.right);
-            _rayFallOriginsBuffer[1] = originPosition + ((_cellSize * 0.5f - 0.001f) * Vector3.left);
-            _rayFallOriginsBuffer[2] = originPosition + ((_cellSize * 0.5f - 0.001f) * Vector3.forward);
-            _rayFallOriginsBuffer[3] = originPosition + ((_cellSize * 0.5f - 0.001f) * Vector3.back);
-
-            for (int i = 0; i < _rayFallOriginsBuffer.Length; i++)
-            {
-                Vector3 origin = _rayFallOriginsBuffer[i];
-                bool hitObstacle = Physics.Raycast(
-                    origin: origin,
-                    direction: Vector3.down,
-                    hitInfo: out RaycastHit hit,
-                    maxDistance: 0.25f,
-                    layerMask: ObstacleLayerMask
-                );
-                if (hitObstacle) return false;
-            }
-
-            return true;
+            return CanMoveTowards(position, Vector3Int.down);
         }
 
-        private void OnDrawGizmos()
+        private void GetTransversals(Vector3Int direction, out Vector3Int transversal1, out Vector3Int transversal2)
+        {
+            Vector3Int candidate1 = new(direction.z, 0, direction.x);
+            Vector3Int candidate2 = new(0, direction.z, direction.y);
+            Vector3Int candidate3 = new(direction.y, direction.x, 0);
+            transversal1 = candidate1 != Vector3.zero ? candidate1 : candidate2;
+            transversal2 = candidate3 != Vector3.zero ? candidate3 : candidate2;
+        }
+
+        private void OnDrawGizmosSelected()
         {
             _origin = null;
             using (Gizmosx.Color(Color.red))
@@ -129,9 +142,7 @@ namespace Pakpak3D
         {
             ForEachCell2D((cell2d) =>
             {
-                int cellX = cell2d.x;
-                int cellY = cell2d.y;
-                Vector3Int cell3d = new(cellX, cellY, 0);
+                Vector3Int cell3d = cell2d.X0Y();
                 Vector3 center = Cell3DToPosition(cell3d)
                     + Vector3.down * (_cellSize * 0.5f);
                 Gizmos.DrawWireCube(center, new Vector3(_cellSize, 0.1f, _cellSize));
@@ -140,12 +151,12 @@ namespace Pakpak3D
 
         private void DrawLayeredCubeGizmos()
         {
-            for (int cellZ = 0; cellZ < _cellCountHeight; cellZ++)
+            for (int cellY = 0; cellY < _cellCountHeight; cellY++)
             {
                 ForEachCell2D((cell2d) =>
                 {
                     int cellX = cell2d.x;
-                    int cellY = cell2d.y;
+                    int cellZ = cell2d.y;
                     Vector3Int cell3d = new(cellX, cellY, cellZ);
                     Vector3 center = Cell3DToPosition(cell3d);
                     Gizmos.DrawWireCube(center, Vector3.one * _cellSize);
@@ -157,13 +168,13 @@ namespace Pakpak3D
         {
             int minCellX = -Mathf.CeilToInt(_cellCountX / 2f - 1);
             int maxCellX = _cellCountX / 2;
-            int minCellY = -Mathf.CeilToInt(_cellCountY / 2f - 1);
-            int maxCellY = _cellCountY / 2;
+            int minCellZ = -Mathf.CeilToInt(_cellCountZ / 2f - 1);
+            int maxCellZ = _cellCountZ / 2;
             for (int cellX = minCellX; cellX <= maxCellX; cellX++)
             {
-                for (int cellY = minCellY; cellY <= maxCellY; cellY++)
+                for (int cellZ = minCellZ; cellZ <= maxCellZ; cellZ++)
                 {
-                    action(new Vector2Int(cellX, cellY));
+                    action(new Vector2Int(cellX, cellZ));
                 }
             }
         }
