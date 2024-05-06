@@ -14,6 +14,7 @@ namespace Pakpak3D
         private Vector2Int _targetDirection;
 
         public Vector3 Position => _movement.Position;
+        public Vector3Int Cell => _movement.Cell;
 
 
         public event Action<Vector3Int> OnSnapInCell;

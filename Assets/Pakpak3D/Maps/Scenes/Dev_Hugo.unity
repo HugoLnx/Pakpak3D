@@ -215,7 +215,6 @@ GameObject:
   - component: {fileID: 86587926}
   - component: {fileID: 86587925}
   - component: {fileID: 86587928}
-  - component: {fileID: 86587929}
   m_Layer: 6
   m_Name: HighPlatforms (11)
   m_TagString: Untagged
@@ -321,22 +320,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cfd594d1d68ca24d8e40f230bf82c8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!208 &86587929
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 86587923}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!1 &269314315
 GameObject:
   m_ObjectHideFlags: 0
@@ -1974,7 +1957,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   m_UseGeometry: 1
   m_DefaultArea: 0
-  m_GenerateLinks: 0
+  m_GenerateLinks: 1
   m_IgnoreNavMeshAgent: 1
   m_IgnoreNavMeshObstacle: 1
   m_OverrideTileSize: 1
@@ -2076,7 +2059,6 @@ GameObject:
   - component: {fileID: 678852155}
   - component: {fileID: 678852154}
   - component: {fileID: 678852157}
-  - component: {fileID: 678852158}
   m_Layer: 6
   m_Name: HighPlatforms (9)
   m_TagString: Untagged
@@ -2182,22 +2164,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cfd594d1d68ca24d8e40f230bf82c8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!208 &678852158
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 678852152}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!1 &679730951
 GameObject:
   m_ObjectHideFlags: 0
@@ -2698,7 +2664,6 @@ GameObject:
   - component: {fileID: 715595127}
   - component: {fileID: 715595126}
   - component: {fileID: 715595129}
-  - component: {fileID: 715595130}
   m_Layer: 6
   m_Name: HighPlatforms (10)
   m_TagString: Untagged
@@ -2804,22 +2769,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cfd594d1d68ca24d8e40f230bf82c8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!208 &715595130
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 715595124}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!1 &897106333
 GameObject:
   m_ObjectHideFlags: 0
@@ -3550,6 +3499,7 @@ GameObject:
   - component: {fileID: 1136457999}
   - component: {fileID: 1136457998}
   - component: {fileID: 1136458001}
+  - component: {fileID: 1136458005}
   - component: {fileID: 1136458002}
   - component: {fileID: 1136458004}
   m_Layer: 6
@@ -3569,7 +3519,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -0.55, z: 0}
-  m_LocalScale: {x: 35, y: 0.1, z: 27}
+  m_LocalScale: {x: 55, y: 0.1, z: 47}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 629828138}
@@ -3658,8 +3608,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cellSize: 1
-  _cellCountX: 35
-  _cellCountZ: 27
+  _cellCountX: 55
+  _cellCountZ: 47
   _cellCountHeight: 0
 --- !u!114 &1136458002
 MonoBehaviour:
@@ -3686,6 +3636,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _root: {fileID: 0}
+--- !u!114 &1136458005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1136457996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21809be3ae8c5ac4d9b6a94919e5f094, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1168658725
 GameObject:
   m_ObjectHideFlags: 0
@@ -4618,7 +4580,6 @@ GameObject:
   - component: {fileID: 1404880302}
   - component: {fileID: 1404880301}
   - component: {fileID: 1404880304}
-  - component: {fileID: 1404880305}
   m_Layer: 6
   m_Name: HighPlatforms (8)
   m_TagString: Untagged
@@ -4724,22 +4685,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cfd594d1d68ca24d8e40f230bf82c8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!208 &1404880305
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1404880299}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!1 &1406147743
 GameObject:
   m_ObjectHideFlags: 0
@@ -5608,7 +5553,7 @@ GameObject:
   - component: {fileID: 1686962275}
   - component: {fileID: 1686962280}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: Blinky
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5713,6 +5658,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _grid: {fileID: 1136458001}
+  _pathfinding: {fileID: 1136458005}
   _target: {fileID: 1814452074}
 --- !u!114 &1686962276
 MonoBehaviour:

@@ -17,7 +17,9 @@ namespace Pakpak3D
             Vector2Int.right
         };
         [SerializeField] private GridBoard _grid;
+        [SerializeField] private GridPathfinding _pathfinding;
         [SerializeField] private Transform _target;
+        private Transform MainTarget => _target;
         private Vector2Int _direction;
         private FlyingMover _flying;
 
@@ -59,10 +61,54 @@ namespace Pakpak3D
 
         private Vector2Int ChooseBestDirectionToTarget(IEnumerable<Vector2Int> directions)
         {
-            Vector2 targetDirection = (_target.position - _flying.Position).XZ().normalized;
+            Vector2? navmeshDirection = GetDirectionFromPathfinding();
+            if (!navmeshDirection.HasValue)
+            {
+                Debug.LogWarning($"No navmesh direction found. Fallback to direction approximation.");
+            }
+
+            Vector2 targetDirection = navmeshDirection.HasValue
+                ? navmeshDirection.Value
+                : (MainTarget.position - _flying.Position).XZ().normalized;
+
             return directions
                 .OrderBy(d => Vector2.Angle(d, targetDirection))
                 .First();
+        }
+
+        private Vector2? GetDirectionFromPathfinding()
+        {
+            Vector2Int targetCell2d = _grid.GetClosestCell(MainTarget.position).XZ();
+            Vector2? chosen = TryPathfindingTo(targetCell2d);
+            if (chosen.HasValue)
+            {
+                return chosen;
+            }
+            foreach (Vector2Int direction in s_allDirections)
+            {
+                chosen = TryPathfindingTo(targetCell2d + direction);
+                if (chosen.HasValue)
+                {
+                    return chosen;
+                }
+            }
+
+            return chosen;
+        }
+
+        private Vector2? TryPathfindingTo(Vector2Int targetCell2d)
+        {
+            Vector2Int? direction = _pathfinding.GetNextStepDirection(
+                start: _flying.Cell.XZ(),
+                target: targetCell2d
+            );
+
+            if (!direction.HasValue)
+            {
+                return null;
+            }
+
+            return direction.Value.AsVector2Float();
         }
 
         private HashSet<Vector2Int> GetAllNonBlockedDirectionsFrom(Vector3 position)
