@@ -68,7 +68,7 @@ namespace Pakpak3D
             if (HasTarget) return;
 
             Vector3 currentPosition = this.Position;
-            _isBlocked = !_grid.CanMoveTowards(currentPosition, _inputDirection.AsVector2Int());
+            _isBlocked = !_grid.CanMoveTowards2D(currentPosition, _inputDirection.AsVector2Int());
             if (_isBlocked)
             {
                 // Debug.Log($"IsBlocked. from:{currentPosition} dir:{_inputDirection}");
@@ -76,7 +76,7 @@ namespace Pakpak3D
                 return;
             }
 
-            Vector2Int currentCell = _grid.GetClosestCell(currentPosition).XY();
+            Vector2Int currentCell = _grid.GetClosestCell(currentPosition).XZ();
             Vector2Int cellDirection = _inputDirection.AsVector2Int();
             Vector2Int targetCell = currentCell + cellDirection;
             _targetPosition = _grid.Cell2DToPosition(targetCell);
@@ -95,7 +95,7 @@ namespace Pakpak3D
                 TranslateBy(toTarget);
                 _targetPosition = null;
                 remainingStep = step - targetDistance;
-                OnSnapInCell?.Invoke(_grid.GetClosestCell(this.Position).XY());
+                OnSnapInCell?.Invoke(_grid.GetClosestCell(this.Position).XZ());
             }
             else
             {
@@ -112,18 +112,18 @@ namespace Pakpak3D
             this._movingPhysics.TranslateBy(offset.X0Y());
         }
 
-        private WaitForSeconds WaitCheckThrottling = new(0.35f);
-        private WaitForFixedUpdate WaitFixedUpdate = new();
-        private WaitForEndOfFrame WaitFrame = new();
+        private readonly WaitForSeconds _waitCheckThrottling = new(0.35f);
+        private readonly WaitForFixedUpdate _waitFixedUpdate = new();
+        private readonly WaitForEndOfFrame _waitFrame = new();
         private IEnumerator FixIfFrozen()
         {
             while (true)
             {
-                yield return WaitCheckThrottling;
+                yield return _waitCheckThrottling;
                 if (!HasTarget) continue;
                 Vector3 lastPosition = this.transform.position;
-                yield return WaitFixedUpdate;
-                yield return WaitFrame;
+                yield return _waitFixedUpdate;
+                yield return _waitFrame;
                 if (lastPosition == this.transform.position && HasTarget)
                 {
                     Debug.LogWarning($"FixIfFrozen: {lastPosition}");
