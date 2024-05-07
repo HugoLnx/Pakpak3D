@@ -9,6 +9,7 @@ namespace Pakpak3D
 {
     public class PakpakMovement : MonoBehaviour
     {
+        public const string TAG = "Pakpak";
         [SerializeField] private Transform _skin;
         private PakpakControls _controls;
         private Grid2DMovement _movement;
