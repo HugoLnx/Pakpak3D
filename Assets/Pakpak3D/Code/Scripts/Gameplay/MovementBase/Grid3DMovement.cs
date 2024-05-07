@@ -10,7 +10,7 @@ namespace Pakpak3D
     {
         [SerializeField] private GridBoard _grid;
         [SerializeField] private float _speed = 5f;
-        [SerializeField] private bool _snapInCell = true;
+        [SerializeField] private bool _forceCellSnapping = true;
         [SerializeField] private bool _ignoreHeightWhenSnapping = true;
         private MovingPhysics _movingPhysics;
         private Vector3Int _targetDirection = Vector3Int.forward;
@@ -22,7 +22,7 @@ namespace Pakpak3D
         public Vector3Int? MovementDirection => IsMoving ? _targetDirection : null;
         public bool IsMovingAllowed => _isMovingAllowed;
 
-        public event Action OnSnapInCell;
+        public event Action OnReachCell;
         public event Action OnBlocked;
         public event Action OnUpdateTarget;
 
@@ -67,7 +67,7 @@ namespace Pakpak3D
         {
             if (!IsMoving) return Position;
             Vector3 endPosition = Position + _currentMovement.Value;
-            if (!_snapInCell) return endPosition;
+            if (!_forceCellSnapping) return endPosition;
 
             Vector3 endCellPosition = _grid.Cell3DToPosition(_grid.GetClosestCell(endPosition));
             if (!_ignoreHeightWhenSnapping) return endCellPosition;
@@ -105,8 +105,8 @@ namespace Pakpak3D
                 TranslateBy(_currentMovement.Value);
                 _currentMovement = null;
                 remainingStep = step - remainingMovement;
-                SnapInCell();
-                OnSnapInCell?.Invoke();
+                ForceCellSnapping();
+                OnReachCell?.Invoke();
             }
             else
             {
@@ -119,9 +119,9 @@ namespace Pakpak3D
             return remainingStep;
         }
 
-        private void SnapInCell()
+        private void ForceCellSnapping()
         {
-            if (!_snapInCell) return;
+            if (!_forceCellSnapping) return;
             Vector3Int cell = _grid.GetClosestCell(Position);
             Vector3 snapPosition = _grid.Cell3DToPosition(cell);
             Vector3 myPosition = Position;

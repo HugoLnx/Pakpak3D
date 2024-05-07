@@ -31,7 +31,7 @@ namespace Pakpak3D
         )
         {
             _flying = flying;
-            _flying.OnSnapInCell += SnapInCellCallback;
+            _flying.OnReachCell += ReachCellCallback;
         }
 
         private void Start()
@@ -39,7 +39,7 @@ namespace Pakpak3D
             UpdateDirection();
         }
 
-        private void SnapInCellCallback()
+        private void ReachCellCallback()
         {
             UpdateDirection();
         }

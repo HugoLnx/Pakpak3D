@@ -23,7 +23,7 @@ namespace Pakpak3D
 
             _controls.OnTurn += TurnTo;
             _controls.OnJump += Jump;
-            _movement.OnSnapInCell += () => _jump.Fall();
+            _movement.OnReachCell += () => _jump.Fall();
             _movement.OnUpdateTarget += UpdateTargetCallback;
             _jump.AfterJumpRise += () => _movement.ResumeMoving();
         }

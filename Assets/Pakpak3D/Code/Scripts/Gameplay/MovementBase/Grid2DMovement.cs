@@ -14,14 +14,14 @@ namespace Pakpak3D
         public bool IsMoving => _movement3d.IsMoving;
         public Vector2Int? MovementDirection => _movement3d.MovementDirection?.XZ();
 
-        public event Action OnSnapInCell;
+        public event Action OnReachCell;
         public event Action OnUpdateTarget;
 
         [LnxInit]
         private void Init(Grid3DMovement movement3d)
         {
             _movement3d = movement3d;
-            _movement3d.OnSnapInCell += () => OnSnapInCell?.Invoke();
+            _movement3d.OnReachCell += () => OnReachCell?.Invoke();
             _movement3d.OnUpdateTarget += () => OnUpdateTarget?.Invoke();
         }
 
