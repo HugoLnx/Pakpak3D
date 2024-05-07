@@ -12,17 +12,16 @@ namespace Pakpak3D
         [SerializeField] private GridBoard _grid;
         [SerializeField] private float _jumpSpeed = 5f;
         [SerializeField] private float _topHeightDuration = 0.5f;
-        private Rigidbody _rbody;
-        private GridMovement _movement;
+        private Grid2DMovement _movement;
         private MovingPhysics _moving;
         private bool _isJumping;
         private bool _isFalling;
         private Vector3 Position => _moving.PositionPreview;
+        public event Action AfterJumpRise;
 
         [LnxInit]
-        private void Init(Rigidbody rbody, GridMovement movement, MovingPhysics moving)
+        private void Init(Grid2DMovement movement, MovingPhysics moving)
         {
-            _rbody = rbody;
             _movement = movement;
             _moving = moving;
         }
@@ -44,6 +43,8 @@ namespace Pakpak3D
         private IEnumerator JumpCoroutine()
         {
             yield return RiseCoroutine();
+            yield return new WaitForFixedUpdate();
+            AfterJumpRise?.Invoke();
             yield return new WaitForSeconds(_topHeightDuration);
             yield return FallCoroutine();
             _isJumping = false;
@@ -103,18 +104,18 @@ namespace Pakpak3D
             Vector3Int cell = _grid.GetClosestCell(Position);
             Vector3 cellPosition = _grid.Cell3DToPosition(cell);
             Vector3 position = new(
-                x: _rbody.position.x,
+                x: Position.x,
                 y: cellPosition.y,
-                z: _rbody.position.z
+                z: Position.z
             );
-            // Debug.Log($"HasSomethingBellow from: {position}");
-            return !_grid.CanFall(position);
+            bool hasSomething = !_grid.CanFall(position);
+            return hasSomething;
         }
 
         private bool HasSomethingBellowMovementTarget()
         {
-            if (!_movement.HasTarget) return false;
-            Vector2 targetPosition = _movement.Target.Value;
+            if (!_movement.IsMoving) return false;
+            Vector2 targetPosition = _movement.GetMovementEndPositionPreview();
             Vector3Int cell = _grid.GetClosestCell(Position);
             Vector3 cellPosition = _grid.Cell3DToPosition(cell);
             Vector3 position = new(
@@ -122,8 +123,8 @@ namespace Pakpak3D
                 y: cellPosition.y,
                 z: targetPosition.y
             );
-            // Debug.Log($"HasSomethingBellowMovementTarget from:{position}");
-            return !_grid.CanFall(position);
+            bool hasSomething = !_grid.CanFall(position);
+            return hasSomething;
         }
     }
 }
