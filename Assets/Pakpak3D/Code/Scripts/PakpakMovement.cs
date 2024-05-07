@@ -11,29 +11,44 @@ namespace Pakpak3D
     {
         [SerializeField] private Transform _skin;
         private PakpakControls _controls;
-        private GridMovement _movement;
+        private Grid2DMovement _movement;
         private GridJump _jump;
 
         [LnxInit]
-        private void Init(PakpakControls controls, GridMovement movement, GridJump jump)
+        private void Init(PakpakControls controls, Grid2DMovement movement, GridJump jump)
         {
             _controls = controls;
             _movement = movement;
             _jump = jump;
 
-            _controls.OnTurn += _movement.TurnTo;
-            _controls.OnJump += _jump.Jump;
-            _movement.OnSnapInCell += (_) => _jump.Fall();
+            _controls.OnTurn += TurnTo;
+            _controls.OnJump += Jump;
+            _movement.OnSnapInCell += () => _jump.Fall();
             _movement.OnUpdateTarget += UpdateTargetCallback;
+            _jump.AfterJumpRise += () => _movement.ResumeMoving();
         }
 
-        private void UpdateTargetCallback(Vector2? targetPosition2d)
+        private void Start()
         {
-            if (!_movement.HasTarget) return;
-            Vector2Int? direction = _movement.CellDirection;
-            Vector3 forwardDirection = direction.Value.AsVector2Float().X0Y().normalized;
-            Debug.Log($"UpdateTargetCallback: {targetPosition2d} {direction} {forwardDirection}");
-            _skin.forward = forwardDirection;
+            TurnTo(Vector2Int.down);
+        }
+
+        public void TurnTo(Vector2 direction)
+        {
+            _movement.TurnTo(direction);
+        }
+
+        public void Jump()
+        {
+            _jump.Jump();
+            _movement.ResumeMoving();
+        }
+
+        private void UpdateTargetCallback()
+        {
+            if (!_movement.IsMoving) return;
+            // Debug.Log($"UpdateTargetCallback: {targetPosition2d} {targetDirection} {forwardDirection}");
+            _skin.forward = _movement.MovementDirection.Value.X0Y();
         }
     }
 }

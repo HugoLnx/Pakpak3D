@@ -17,7 +17,7 @@ namespace Pakpak3D
         public Vector3Int Cell => _movement.Cell;
 
 
-        public event Action<Vector3Int> OnSnapInCell;
+        public event Action OnSnapInCell;
 
         [LnxInit]
         private void Init(Grid3DMovement movement)
@@ -46,9 +46,9 @@ namespace Pakpak3D
             _movement.ResumeMoving();
         }
 
-        private void SnapInCellCallback(Vector3Int cell)
+        private void SnapInCellCallback()
         {
-            OnSnapInCell?.Invoke(cell);
+            OnSnapInCell?.Invoke();
             Vector3Int turnToDirection = HasToFall()
                 ? Vector3Int.down
                 : _targetDirection.X0Y();

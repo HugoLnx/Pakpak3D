@@ -39,7 +39,7 @@ namespace Pakpak3D
             UpdateDirection();
         }
 
-        private void SnapInCellCallback(Vector3Int cell)
+        private void SnapInCellCallback()
         {
             UpdateDirection();
         }
@@ -153,7 +153,7 @@ namespace Pakpak3D
         {
             if (_preferredWaypoint == null)
             {
-                Debug.Log($"No preferred waypoint. Using main target: {_mainTarget.position}");
+                // Debug.Log($"No preferred waypoint. Using main target: {_mainTarget.position}");
                 return _mainTarget.position;
             }
 
@@ -164,7 +164,7 @@ namespace Pakpak3D
             float distanceToWaypoint = Vector2.Distance(myPosition, waypointPosition);
             if (distanceToWaypoint <= _minDistanceToIgnoreWaypoint)
             {
-                Debug.Log($"Distance to waypoint: {distanceToWaypoint} <= {_minDistanceToIgnoreWaypoint}. Ignoring waypoint.");
+                // Debug.Log($"Distance to waypoint: {distanceToWaypoint} <= {_minDistanceToIgnoreWaypoint}. Ignoring waypoint.");
                 return _mainTarget.position;
             }
 
@@ -178,11 +178,11 @@ namespace Pakpak3D
             if (!isWithinSegmentLimits
                 || segmentDistance <= _minDistanceToIgnoreWaypoint)
             {
-                Debug.Log($"Distance to waypoint SEGMENT: {segmentDistance} <= {_minDistanceToIgnoreWaypoint}. Ignoring waypoint.");
+                // Debug.Log($"Distance to waypoint SEGMENT: {segmentDistance} <= {_minDistanceToIgnoreWaypoint}. Ignoring waypoint.");
                 return _mainTarget.position;
             }
 
-            Debug.Log($"Using waypoint: {waypointPosition}. segmentDistance:{segmentDistance} isWithinSegmentLimits:{isWithinSegmentLimits}");
+            // Debug.Log($"Using waypoint: {waypointPosition}. segmentDistance:{segmentDistance} isWithinSegmentLimits:{isWithinSegmentLimits}");
             return _preferredWaypoint.position;
         }
 

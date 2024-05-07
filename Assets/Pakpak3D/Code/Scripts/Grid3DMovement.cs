@@ -10,36 +10,37 @@ namespace Pakpak3D
     {
         [SerializeField] private GridBoard _grid;
         [SerializeField] private float _speed = 5f;
-        private Rigidbody _rbody;
+        [SerializeField] private bool _snapInCell = true;
+        [SerializeField] private bool _ignoreHeightWhenSnapping = true;
         private MovingPhysics _movingPhysics;
         private Vector3Int _targetDirection = Vector3Int.forward;
-        private Vector3Int? _targetCell;
-        private bool _isMoving;
-        public Vector3 Position => _rbody.position;
+        private Vector3? _currentMovement;
+        private bool _isMovingAllowed;
+        public Vector3 Position => _movingPhysics.PositionPreview;
         public Vector3Int Cell => _grid.GetClosestCell(Position);
-        public bool HasTarget => _targetCell.HasValue;
-        public Vector3Int? TargetCell => _targetCell;
-        public bool IsMoving => _isMoving;
+        public bool IsMoving => _currentMovement.HasValue;
+        public Vector3Int? MovementDirection => IsMoving ? _targetDirection : null;
+        public bool IsMovingAllowed => _isMovingAllowed;
 
-        public event Action<Vector3Int> OnSnapInCell;
+        public event Action OnSnapInCell;
         public event Action OnBlocked;
+        public event Action OnUpdateTarget;
 
         [LnxInit]
-        private void Init(Rigidbody rbody, MovingPhysics movingPhysics)
+        private void Init(MovingPhysics movingPhysics)
         {
-            _rbody = rbody;
             _movingPhysics = movingPhysics;
         }
 
         private void FixedUpdate()
         {
-            if (!IsMoving) return;
+            if (!IsMovingAllowed) return;
             float step = _speed * Time.fixedDeltaTime;
-            UpdateTarget();
-            while (HasTarget && step > 0)
+            UpdateTargetMovement();
+            while (IsMoving && step > 0)
             {
-                step = ConsumeStepTowardsTargetBy(step);
-                UpdateTarget();
+                step = ConsumeTargetMovementBy(step);
+                UpdateTargetMovement();
             }
         }
 
@@ -54,56 +55,82 @@ namespace Pakpak3D
 
         public void ResumeMoving()
         {
-            _isMoving = true;
+            _isMovingAllowed = true;
         }
 
         public void StopMoving()
         {
-            _isMoving = false;
+            _isMovingAllowed = false;
         }
 
-        private void UpdateTarget()
+        public Vector3 GetMovementEndPositionPreview()
         {
-            if (HasTarget) return;
+            if (!IsMoving) return Position;
+            Vector3 endPosition = Position + _currentMovement.Value;
+            if (!_snapInCell) return endPosition;
+
+            Vector3 endCellPosition = _grid.Cell3DToPosition(_grid.GetClosestCell(endPosition));
+            if (!_ignoreHeightWhenSnapping) return endCellPosition;
+            return endCellPosition.X0Z();
+        }
+
+        private void UpdateTargetMovement()
+        {
+            if (IsMoving) return;
 
             Vector3 currentPosition = this.Position;
             bool isBlocked = !_grid.CanMoveTowards(currentPosition, _targetDirection);
             if (isBlocked)
             {
-                _targetCell = null;
+                _currentMovement = null;
                 StopMoving();
                 OnBlocked?.Invoke();
+                OnUpdateTarget?.Invoke();
                 return;
             }
 
             Vector3Int currentCell = _grid.GetClosestCell(currentPosition);
-            Vector3Int cellDirection = _targetDirection;
-            _targetCell = currentCell + cellDirection;
+            _currentMovement = _targetDirection.AsVector3Float() * _grid.CellSize;
+            OnUpdateTarget?.Invoke();
         }
 
-        private float ConsumeStepTowardsTargetBy(float step)
+        private float ConsumeTargetMovementBy(float step)
         {
-            if (!HasTarget || !IsMoving) return 0;
-            Vector3 targetPosition = _grid.Cell3DToPosition(_targetCell.Value);
-            Vector3 toTarget = targetPosition - this.Position;
-            float targetDistance = toTarget.magnitude;
+            if (!IsMoving || !IsMovingAllowed) return 0;
+            float remainingMovement = _currentMovement.Value.magnitude;
 
             float remainingStep = 0;
-            if (step >= targetDistance)
+            if (step >= remainingMovement)
             {
-                TranslateBy(toTarget);
-                _targetCell = null;
-                remainingStep = step - targetDistance;
-                OnSnapInCell?.Invoke(_grid.GetClosestCell(this.Position));
+                TranslateBy(_currentMovement.Value);
+                _currentMovement = null;
+                remainingStep = step - remainingMovement;
+                SnapInCell();
+                OnSnapInCell?.Invoke();
             }
             else
             {
-                Vector3 targetDirection = toTarget / targetDistance;
-                TranslateBy(targetDirection * step);
+                Vector3 movementDirection = _currentMovement.Value / remainingMovement;
+                TranslateBy(movementDirection * step);
+                _currentMovement = movementDirection * (remainingMovement - step);
                 remainingStep = 0;
             }
 
             return remainingStep;
+        }
+
+        private void SnapInCell()
+        {
+            if (!_snapInCell) return;
+            Vector3Int cell = _grid.GetClosestCell(Position);
+            Vector3 snapPosition = _grid.Cell3DToPosition(cell);
+            Vector3 myPosition = Position;
+            Vector3 snapOffset = snapPosition - myPosition;
+            if (_ignoreHeightWhenSnapping)
+            {
+                snapOffset.y = 0;
+            }
+            TranslateBy(snapOffset);
         }
 
         private void TranslateBy(Vector3 offset)
