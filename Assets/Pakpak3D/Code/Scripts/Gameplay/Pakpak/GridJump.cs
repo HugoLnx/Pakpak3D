@@ -61,13 +61,11 @@ namespace Pakpak3D
 
         private IEnumerator FallCoroutine()
         {
-            Debug.Log("Fall Check");
             if (HasSomethingBellow() || HasSomethingBellowMovementTarget())
             {
                 _isFalling = false;
                 yield break;
             }
-            Debug.Log("Start Falling");
 
             float jumpHeight = _grid.CellSize;
             yield return HeightVariationCoroutine(
@@ -76,7 +74,6 @@ namespace Pakpak3D
                 reverse: true
             );
             _isFalling = false;
-            Debug.Log("End Falling");
         }
 
         private IEnumerator HeightVariationCoroutine(float deltaHeight, Ease ease, bool reverse = false)
@@ -112,7 +109,6 @@ namespace Pakpak3D
                 z: Position.z
             );
             bool hasSomething = !_grid.CanFall(position);
-            Debug.Log($"HasSomethingBellow from: {position} canFall:{!hasSomething}");
             return hasSomething;
         }
 
@@ -128,7 +124,6 @@ namespace Pakpak3D
                 z: targetPosition.y
             );
             bool hasSomething = !_grid.CanFall(position);
-            Debug.Log($"HasSomethingBellowMovementTarget from: {position} canFall:{!hasSomething}");
             return hasSomething;
         }
     }
