@@ -8,18 +8,21 @@ namespace Pakpak3D
 {
     public class PointCollectable : MonoBehaviour
     {
+        [SerializeField] private int _scoreValue = 15;
         private Collectable _collectable;
+        private ScoreService _scoreService;
 
         [LnxInit]
-        private void Init(Collectable collectable)
+        private void Init(Collectable collectable, ScoreService scoreService)
         {
             _collectable = collectable;
             _collectable.OnCollected += Collect;
+            _scoreService = scoreService;
         }
 
         private void Collect()
         {
-            Debug.Log("Point collected");
+            _scoreService?.AddScore(_scoreValue);
         }
     }
 }
