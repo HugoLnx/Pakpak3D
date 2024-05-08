@@ -21,6 +21,7 @@ namespace Pakpak3D
         [SerializeField] private Transform _mainTarget;
         [SerializeField] private Transform _preferredWaypoint;
         [SerializeField] private float _minDistanceToIgnoreWaypoint = 1f;
+        [SerializeField] private bool _ignoreNavmesh = false;
         private Vector3 _currentTargetPosition;
         private Vector2Int _direction;
         private FlyingMover _flying;
@@ -37,6 +38,27 @@ namespace Pakpak3D
         private void Start()
         {
             UpdateDirection();
+        }
+
+        public void SetChasing(
+            Transform mainTarget,
+            Transform preferredWaypoint = null,
+            float? minDistanceToIgnoreWaypoint = null,
+            bool ignoreNavmesh = false)
+        {
+            _mainTarget = mainTarget;
+            _preferredWaypoint = preferredWaypoint;
+            if (minDistanceToIgnoreWaypoint.HasValue)
+            {
+                _minDistanceToIgnoreWaypoint = minDistanceToIgnoreWaypoint.Value;
+            }
+            _ignoreNavmesh = ignoreNavmesh;
+            UpdateCurrentTargetPosition();
+        }
+
+        public float GetDistanceToTarget()
+        {
+            return Vector2.Distance(_flying.Position.XZ(), _currentTargetPosition.XZ());
         }
 
         private void ReachCellCallback()
@@ -80,6 +102,7 @@ namespace Pakpak3D
 
         private Vector2? GetDirectionFromPathfinding()
         {
+            if (_ignoreNavmesh) return null;
             Vector2Int targetCell2d = _grid.GetClosestCell(_currentTargetPosition).XZ();
             Vector2? chosen = TryPathfindingTo(targetCell2d);
             if (chosen.HasValue)
@@ -146,7 +169,6 @@ namespace Pakpak3D
         private void UpdateCurrentTargetPosition()
         {
             _currentTargetPosition = GetCurrentTargetPosition();
-
         }
 
         private Vector3 GetCurrentTargetPosition()
