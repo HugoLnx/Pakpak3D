@@ -8,7 +8,7 @@ namespace Pakpak3D
     [LnxService]
     public class HuntInstructorService : MonoBehaviour
     {
-        [SerializeField] private HuntInstruction _instruction = HuntInstruction.Hunt;
+        [SerializeField] private HuntInstruction _instruction = HuntInstruction.Attack;
         public HuntInstruction Instruction => _instruction;
         public event Action<HuntInstruction> OnInstructionChanged;
 
@@ -29,7 +29,7 @@ namespace Pakpak3D
             while (true)
             {
                 yield return new WaitForSeconds(10f);
-                HuntInstruction newInstruction = _instruction == HuntInstruction.Hunt ? HuntInstruction.Scatter : HuntInstruction.Hunt;
+                HuntInstruction newInstruction = _instruction == HuntInstruction.Attack ? HuntInstruction.Scatter : HuntInstruction.Attack;
                 SpreadInstruction(newInstruction);
             }
         }

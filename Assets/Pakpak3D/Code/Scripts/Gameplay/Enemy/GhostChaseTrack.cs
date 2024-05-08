@@ -43,7 +43,6 @@ namespace Pakpak3D
 
         private IEnumerator ChaseCoroutine()
         {
-            Debug.Log($"Chasing Track {_track.gameObject.name}");
             _isChasing = true;
             int childCount = _track.childCount;
             var waypoints = new Transform[childCount];

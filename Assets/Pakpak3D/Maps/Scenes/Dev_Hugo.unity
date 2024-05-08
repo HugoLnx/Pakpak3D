@@ -18895,6 +18895,11 @@ PrefabInstance:
       propertyPath: _mainTarget
       value: 
       objectReference: {fileID: 1953540198}
+    - target: {fileID: 7938024187383290604, guid: 0c2438f75c1fcb542b5dd06401ec28d1,
+        type: 3}
+      propertyPath: _target
+      value: 
+      objectReference: {fileID: 1953540198}
     - target: {fileID: 8321455707487155977, guid: 0c2438f75c1fcb542b5dd06401ec28d1,
         type: 3}
       propertyPath: _grid
