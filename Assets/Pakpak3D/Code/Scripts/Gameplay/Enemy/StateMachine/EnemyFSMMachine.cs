@@ -9,6 +9,7 @@ namespace Pakpak3D
     {
         [field: SerializeField] public EnemyFSMMessage GoHunt { get; private set; }
         [field: SerializeField] public EnemyFSMMessage GetScared { get; private set; }
+        [field: SerializeField] public EnemyFSMMessage EndScared { get; private set; }
         [field: SerializeField] public EnemyFSMMessage TouchedPlayer { get; private set; }
         [field: SerializeField] public EnemyFSMMessage TimerEnded { get; private set; }
         [field: SerializeField] public EnemyFSMMessage EnteredHouse { get; private set; }
@@ -42,7 +43,7 @@ namespace Pakpak3D
                 .AddTransition(GetScared, _scaredState);
 
             builder.From(_scaredState)
-                .AddTransition(TimerEnded, _huntState)
+                .AddTransition(EndScared, _huntState)
                 .AddTransition(TouchedPlayer, _eatenState);
 
             builder.From(_eatenState)
