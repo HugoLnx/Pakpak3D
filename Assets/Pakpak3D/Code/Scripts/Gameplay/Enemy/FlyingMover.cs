@@ -25,25 +25,29 @@ namespace Pakpak3D
             _movement = movement;
             _movement.OnBlocked += BlockedCallback;
             _movement.OnReachCell += ReachCellCallback;
-            _movement.StopMoving();
         }
 
         public void TurnTo(Vector2Int direction)
         {
             _targetDirection = direction;
             _movement.TurnTo(direction.X0Y());
+            ResumeMoving();
+        }
+
+        public void ResumeMoving()
+        {
             _movement.ResumeMoving();
         }
 
-        public void StopMoving()
+        public void PauseMoving()
         {
-            _movement.StopMoving();
+            _movement.PauseMoving();
         }
 
         private void BlockedCallback()
         {
             _movement.TurnTo(Vector3Int.up);
-            _movement.ResumeMoving();
+            ResumeMoving();
         }
 
         private void ReachCellCallback()

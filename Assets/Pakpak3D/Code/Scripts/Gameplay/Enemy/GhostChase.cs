@@ -61,6 +61,16 @@ namespace Pakpak3D
             return Vector2.Distance(_flying.Position.XZ(), _currentTargetPosition.XZ());
         }
 
+        public void ResumeChasing()
+        {
+            _flying.ResumeMoving();
+        }
+
+        public void PauseChasing()
+        {
+            _flying.PauseMoving();
+        }
+
         private void ReachCellCallback()
         {
             UpdateDirection();
@@ -86,7 +96,7 @@ namespace Pakpak3D
         private Vector2Int ChooseBestDirectionToTarget(IEnumerable<Vector2Int> directions)
         {
             Vector2? navmeshDirection = GetDirectionFromPathfinding();
-            if (!navmeshDirection.HasValue)
+            if (!navmeshDirection.HasValue && !_ignoreNavmesh)
             {
                 Debug.LogWarning($"No navmesh direction found. Fallback to direction approximation.");
             }

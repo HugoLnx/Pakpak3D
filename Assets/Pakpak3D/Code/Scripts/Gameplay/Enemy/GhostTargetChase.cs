@@ -12,6 +12,7 @@ namespace Pakpak3D
         [SerializeField] private Transform _preferredWaypoint;
         [SerializeField] private float _minDistanceToIgnoreWaypoint = 1f;
         private GhostChase _chase;
+        private bool _isChasing;
 
         [LnxInit]
         private void Init(GhostChase chase)
@@ -20,9 +21,16 @@ namespace Pakpak3D
         }
 
         [Button]
-        private void BeginChase()
+        public void EnsureChasing()
         {
             _chase.SetChasing(_mainTarget, _preferredWaypoint, _minDistanceToIgnoreWaypoint);
+            _chase.ResumeChasing();
+        }
+
+        [Button]
+        public void StopChasing()
+        {
+            _chase.PauseChasing();
         }
     }
 }
