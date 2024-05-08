@@ -295,7 +295,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _bootTrack: {fileID: 0}
-  _bootTime: 5
+  _bootMinTime: 2
+  _bootMaxTime: 13
 --- !u!114 &1499574794971809395
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,6 +310,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scatterTrack: {fileID: 0}
+  _forceScatterIfCloserThan: -1
 --- !u!1 &5731781672503228833
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,7 +8,8 @@ namespace Pakpak3D
     public class BootState : EnemyFSMState
     {
         [SerializeField] private Transform _bootTrack;
-        [SerializeField] private float _bootTime = 5f;
+        [SerializeField] private float _bootMinTime = 3f;
+        [SerializeField] private float _bootMaxTime = 12f;
         private EnemyFSMMachine _fsm;
         private GhostChaseTrack _chaseTrack;
 
@@ -39,7 +40,8 @@ namespace Pakpak3D
 
         private IEnumerator WaitBoot()
         {
-            yield return new WaitForSeconds(_bootTime);
+            float bootTime = UnityEngine.Random.Range(_bootMinTime, _bootMaxTime);
+            yield return new WaitForSeconds(bootTime);
             _fsm.SendMessage(_fsm.TimerEnded);
         }
     }
