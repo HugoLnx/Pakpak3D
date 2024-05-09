@@ -18412,6 +18412,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1958110821}
     m_Modifications:
+    - target: {fileID: 108460535286257049, guid: 324f2e3cc48f162469b6d4ade89931be,
+        type: 3}
+      propertyPath: _bootTrack
+      value: 
+      objectReference: {fileID: 403061870}
     - target: {fileID: 828514190806391598, guid: 324f2e3cc48f162469b6d4ade89931be,
         type: 3}
       propertyPath: _scatterTrack
@@ -18639,6 +18644,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2637593145423492172, guid: 9d49cb39902770145b53d35bfd30f679,
+        type: 3}
+      propertyPath: _bootTrack
+      value: 
+      objectReference: {fileID: 403061870}
     - target: {fileID: 3342992475575335675, guid: 9d49cb39902770145b53d35bfd30f679,
         type: 3}
       propertyPath: _scatterTrack
@@ -18857,6 +18867,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6940031011237775131, guid: 8c49bd6718c2ae74ca93bf49cf49e595,
+        type: 3}
+      propertyPath: _bootTrack
+      value: 
+      objectReference: {fileID: 403061870}
     - target: {fileID: 7688168357673404844, guid: 8c49bd6718c2ae74ca93bf49cf49e595,
         type: 3}
       propertyPath: _scatterTrack
@@ -18905,6 +18920,11 @@ PrefabInstance:
       propertyPath: _scatterTrack
       value: 
       objectReference: {fileID: 1983875553}
+    - target: {fileID: 3829314854624464041, guid: 0c2438f75c1fcb542b5dd06401ec28d1,
+        type: 3}
+      propertyPath: _bootTrack
+      value: 
+      objectReference: {fileID: 403061870}
     - target: {fileID: 4601087405821575710, guid: 0c2438f75c1fcb542b5dd06401ec28d1,
         type: 3}
       propertyPath: _scatterTrack

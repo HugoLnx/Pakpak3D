@@ -6,6 +6,8 @@ namespace Pakpak3D
 {
     public class Ghost : MonoBehaviour
     {
+        public bool IsScared => _fsm.Scared.IsActive;
+
         private EnemyFSMMachine _fsm;
 
         [LnxInit]
@@ -22,6 +24,11 @@ namespace Pakpak3D
         public void EndScared()
         {
             _fsm.SendMessage(_fsm.EndScared);
+        }
+
+        public void TouchedPlayer()
+        {
+            _fsm.SendMessage(_fsm.TouchedPlayer);
         }
     }
 }

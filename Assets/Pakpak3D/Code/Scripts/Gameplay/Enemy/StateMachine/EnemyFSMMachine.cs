@@ -13,11 +13,11 @@ namespace Pakpak3D
         [field: SerializeField] public EnemyFSMMessage TouchedPlayer { get; private set; }
         [field: SerializeField] public EnemyFSMMessage TimerEnded { get; private set; }
         [field: SerializeField] public EnemyFSMMessage EnteredHouse { get; private set; }
-        private EnemyFSMState _bootState;
-        private EnemyFSMState _huntState;
-        private EnemyFSMState _scaredState;
-        private EnemyFSMState _eatenState;
-        protected override EnemyFSMState InitialState => _bootState;
+        public EnemyFSMState Boot { get; private set; }
+        public EnemyFSMState Hunt { get; private set; }
+        public EnemyFSMState Scared { get; private set; }
+        public EnemyFSMState Eaten { get; private set; }
+        protected override EnemyFSMState InitialState => Boot;
 
         [LnxInit]
         private void Init(
@@ -27,27 +27,27 @@ namespace Pakpak3D
             EatenState eatenState
         )
         {
-            _bootState = bootState;
-            _huntState = huntState;
-            _scaredState = scaredState;
-            _eatenState = eatenState;
+            Boot = bootState;
+            Hunt = huntState;
+            Scared = scaredState;
+            Eaten = eatenState;
         }
 
         protected override Dictionary<(EnemyFSMState, EnemyFSMMessage), EnemyFSMState> TransitionsAwakeSetup()
         {
             FSMTransitionBuilder<EnemyFSMMessage, EnemyFSMState> builder = new();
-            builder.From(_bootState)
-                .AddTransition(TimerEnded, _huntState);
+            builder.From(Boot)
+                .AddTransition(TimerEnded, Hunt);
 
-            builder.From(_huntState, _bootState)
-                .AddTransition(GetScared, _scaredState);
+            builder.From(Hunt, Boot)
+                .AddTransition(GetScared, Scared);
 
-            builder.From(_scaredState)
-                .AddTransition(EndScared, _huntState)
-                .AddTransition(TouchedPlayer, _eatenState);
+            builder.From(Scared)
+                .AddTransition(EndScared, Hunt)
+                .AddTransition(TouchedPlayer, Eaten);
 
-            builder.From(_eatenState)
-                .AddTransition(EnteredHouse, _bootState);
+            builder.From(Eaten)
+                .AddTransition(EnteredHouse, Boot);
 
             return builder.Get();
         }

@@ -13,6 +13,7 @@ namespace Pakpak3D
         [SerializeField] protected float _distanceToReachTarget = 1f;
         private GhostChase _chase;
         private bool _isChasing;
+        public event Action OnReachTrack;
 
         [LnxInit]
         private void Init(GhostChase chase)
@@ -59,6 +60,10 @@ namespace Pakpak3D
                 _chase.ResumeChasing();
                 yield return new WaitWhile(() => _isChasing && _chase.GetDistanceToTarget() > _distanceToReachTarget);
                 inx = (inx + 1) % childCount;
+                if (!isInTrack)
+                {
+                    OnReachTrack?.Invoke();
+                }
                 isInTrack = true;
             }
 
