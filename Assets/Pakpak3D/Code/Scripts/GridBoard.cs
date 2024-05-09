@@ -122,10 +122,22 @@ namespace Pakpak3D
             transversal2 = candidate3 != Vector3.zero ? candidate3 : candidate2;
         }
 
+        private void OnDrawGizmos()
+        {
+            var gizmosUnselectedColor = new Color(0.5f, 0.25f, 0.25f, 0.02f);
+            DrawGridGizmos(gizmosUnselectedColor);
+        }
+
         private void OnDrawGizmosSelected()
         {
+            var gizmosSelectedColor = new Color(0.5f, 0f, 0f, 0.5f);
+            DrawGridGizmos(gizmosSelectedColor);
+        }
+
+        private void DrawGridGizmos(Color gridGizmosColor)
+        {
             _origin = null;
-            using (Gizmosx.Color(Color.red))
+            using (Gizmosx.Color(gridGizmosColor))
             {
                 if (_cellCountHeight == 0)
                 {

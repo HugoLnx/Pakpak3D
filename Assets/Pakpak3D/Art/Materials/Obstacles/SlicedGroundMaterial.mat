@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SlicedPlatformMaterial
+  m_Name: SlicedGroundMaterial
   m_Shader: {fileID: 4800000, guid: 28b4807c8f37b2c47b97ef1ef648cdcc, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0

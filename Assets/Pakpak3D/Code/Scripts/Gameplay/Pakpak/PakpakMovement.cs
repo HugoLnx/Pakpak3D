@@ -11,6 +11,7 @@ namespace Pakpak3D
     {
         public const string TAG = "Pakpak";
         [SerializeField] private Transform _skin;
+        [SerializeField] private Vector2Int _initialDirection = Vector2Int.up;
         private PakpakControls _controls;
         private Grid2DMovement _movement;
         private GridJump _jump;
@@ -31,7 +32,7 @@ namespace Pakpak3D
 
         private void Start()
         {
-            TurnTo(Vector2Int.down);
+            TurnTo(_initialDirection);
         }
 
         public void TurnTo(Vector2 direction)
