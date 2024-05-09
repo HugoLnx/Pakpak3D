@@ -9,9 +9,9 @@ namespace Pakpak3D
 {
     public class GridJump : MonoBehaviour
     {
-        [SerializeField] private GridBoard _grid;
         [SerializeField] private float _jumpSpeed = 5f;
         [SerializeField] private float _topHeightDuration = 0.5f;
+        private GridBoard _grid;
         private Grid2DMovement _movement;
         private MovingPhysics _moving;
         private bool _isJumping;
@@ -20,10 +20,15 @@ namespace Pakpak3D
         public event Action AfterJumpRise;
 
         [LnxInit]
-        private void Init(Grid2DMovement movement, MovingPhysics moving)
+        private void Init(
+            Grid2DMovement movement,
+            MovingPhysics moving,
+            [FromParentEntity] GridBoard grid
+        )
         {
             _movement = movement;
             _moving = moving;
+            _grid = grid;
         }
 
         public void Jump()

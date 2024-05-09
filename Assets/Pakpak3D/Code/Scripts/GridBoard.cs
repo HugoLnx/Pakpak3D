@@ -22,8 +22,11 @@ namespace Pakpak3D
                 + Vector3.right * -(_cellSize * 0.5f * ((_cellCountX + 1) % 2))
                 + Vector3.forward * -(_cellSize * 0.5f * ((_cellCountZ + 1) % 2));
 
-        private int ObstacleLayerMask => _obstacleLayerMask ??= LayerMask.GetMask("Obstacle");
-        private int? _obstacleLayerMask;
+        private int WallLayerMask => _wallLayerMask ??= LayerMask.GetMask("Wall");
+        private int? _wallLayerMask;
+        private int GroundLayerMask => _groundLayerMask ??= LayerMask.GetMask("Ground");
+        private int? _groundLayerMask;
+        private int AnyObstacleLayerMask => WallLayerMask | GroundLayerMask;
 
 
         private void Start()
@@ -56,17 +59,17 @@ namespace Pakpak3D
             return CanMoveTowards(position, direction.X0Y());
         }
 
-        public Vector3Int? GetCellAboveFloor(Vector2Int cell2d)
+        public Vector3Int? GetCellAboveGround(Vector2Int cell2d)
         {
-            float maxFloorHeight = _cellSize * 5f;
-            Vector3 cellSkyPosition = Cell2DToPosition(cell2d).X0Y() + Vector3.up * maxFloorHeight;
+            float maxGroundHeight = _cellSize * 5f;
+            Vector3 cellSkyPosition = Cell2DToPosition(cell2d).X0Y() + Vector3.up * maxGroundHeight;
 
             bool hitObstacle = Physics.Raycast(
                 origin: cellSkyPosition,
                 direction: Vector3.down,
                 hitInfo: out RaycastHit hit,
-                maxDistance: maxFloorHeight + _cellSize,
-                layerMask: ObstacleLayerMask
+                maxDistance: maxGroundHeight + _cellSize,
+                layerMask: GroundLayerMask
             );
             if (!hitObstacle) return null;
             return GetClosestCell(hit.point + Vector3.up * (_cellSize * 0.5f));
@@ -74,12 +77,13 @@ namespace Pakpak3D
 
         // TODO: Remove this logic from GridBoard because each object must have it's own buffer
         private Vector3[] _rayMoveOriginsBuffer = new Vector3[4];
-        public bool CanMoveTowards(Vector3 position, Vector3Int direction)
+        public bool CanMoveTowards(Vector3 position, Vector3Int direction, bool ignoreGround = false)
         {
             if (!Grid3DDirection.IsValidDirection(direction))
             {
                 throw new ArgumentException($"Invalid direction: {direction}. It should be a normalized vector with only one non-zero component.");
             }
+            LayerMask layerMask = ignoreGround ? WallLayerMask : AnyObstacleLayerMask;
             Vector3Int originCell = GetClosestCell(position);
             Vector3 originPosition = Cell3DToPosition(originCell);
             Vector3 moveDirection = direction.AsVector3Float();
@@ -100,7 +104,7 @@ namespace Pakpak3D
                     direction: moveDirection,
                     hitInfo: out RaycastHit hit,
                     maxDistance: _cellSize * 0.75f,
-                    layerMask: ObstacleLayerMask
+                    layerMask: layerMask
                 );
                 if (hitObstacle) return false;
             }

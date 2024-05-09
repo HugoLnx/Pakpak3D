@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8975809768847717102}
   - component: {fileID: 4735481799849347726}
-  m_Layer: 6
+  m_Layer: 10
   m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62,7 +62,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7330336258839690139}
-  m_Layer: 6
+  m_Layer: 10
   m_Name: GroundTile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1868481887629312314}
-  m_Layer: 6
+  m_Layer: 10
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 6101510887291543409}
   - component: {fileID: 5063131640790676410}
   - component: {fileID: 2248443241862033608}
-  m_Layer: 6
+  m_Layer: 10
   m_Name: Skin
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -7,16 +7,16 @@ using UnityEngine;
 namespace Pakpak3D
 {
     [LnxAutoAdd]
-    public class GhostChaseTrack : MonoBehaviour
+    public class GhostTrackLooper : MonoBehaviour
     {
         [SerializeField] protected Transform _track;
         [SerializeField] protected float _distanceToReachTarget = 1f;
-        private GhostChase _chase;
+        private GhostTargetChase _chase;
         private bool _isChasing;
         public event Action OnReachTrack;
 
         [LnxInit]
-        private void Init(GhostChase chase)
+        private void Init(GhostTargetChase chase)
         {
             _chase = chase;
         }

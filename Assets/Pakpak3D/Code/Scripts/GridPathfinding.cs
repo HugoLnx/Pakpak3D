@@ -19,13 +19,13 @@ namespace Pakpak3D
 
         public Vector2Int? GetNextStepDirection(Vector2Int start, Vector2Int target)
         {
-            Vector3Int? startCell = _grid.GetCellAboveFloor(start);
+            Vector3Int? startCell = _grid.GetCellAboveGround(start);
             if (!startCell.HasValue)
             {
                 throw new System.Exception($"Invalid start position: {start}");
             }
 
-            Vector3Int? targetCell = _grid.GetCellAboveFloor(target);
+            Vector3Int? targetCell = _grid.GetCellAboveGround(target);
             if (!targetCell.HasValue)
             {
                 return null;

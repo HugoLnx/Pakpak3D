@@ -8,10 +8,10 @@ namespace Pakpak3D
 {
     public class Grid3DMovement : MonoBehaviour
     {
-        [SerializeField] private GridBoard _grid;
         [SerializeField] private float _speed = 5f;
         [SerializeField] private bool _forceCellSnapping = true;
         [SerializeField] private bool _ignoreHeightWhenSnapping = true;
+        private GridBoard _grid;
         private MovingPhysics _movingPhysics;
         private Vector3Int _targetDirection = Vector3Int.forward;
         private Vector3? _currentMovement;
@@ -29,9 +29,13 @@ namespace Pakpak3D
         public event Action OnUpdateTarget;
 
         [LnxInit]
-        private void Init(MovingPhysics movingPhysics)
+        private void Init(
+            MovingPhysics movingPhysics,
+            [FromParentEntity] GridBoard grid
+        )
         {
             _movingPhysics = movingPhysics;
+            _grid = grid;
         }
 
         private void FixedUpdate()

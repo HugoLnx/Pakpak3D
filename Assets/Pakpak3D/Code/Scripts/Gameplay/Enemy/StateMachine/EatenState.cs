@@ -7,29 +7,28 @@ namespace Pakpak3D
     public class EatenState : EnemyFSMState
     {
         [SerializeField] private Material _eatenMaterial;
-        [SerializeField] private Transform _bootTrack;
         private EnemyFSMMachine _fsm;
-        private GhostChaseTrack _chaseTrack;
+        private GhostMovementFacade _movementFacade;
         private MeshRenderer _meshRenderer;
         private Material _previousMaterial;
 
         [LnxInit]
         private void Init(
             EnemyFSMMachine fsm,
-            GhostChaseTrack chaseTrack,
+            GhostMovementFacade movementFacade,
             MeshRenderer meshRenderer
         )
         {
             _fsm = fsm;
-            _chaseTrack = chaseTrack;
+            _movementFacade = movementFacade;
             _meshRenderer = meshRenderer;
         }
 
         protected override void OnEnter(EnemyFSMState previousState)
         {
             base.OnEnter(previousState);
-            _chaseTrack.OnReachTrack += OnReachBootTrack;
-            _chaseTrack.EnsureChasing(_bootTrack);
+            _movementFacade.OnReachTrack += OnReachBootTrack;
+            _movementFacade.LoopBootTrack();
             _previousMaterial = _meshRenderer.material;
             _meshRenderer.material = _eatenMaterial;
         }
@@ -37,9 +36,9 @@ namespace Pakpak3D
         protected override void OnExit(EnemyFSMState nextState)
         {
             base.OnExit(nextState);
-            _chaseTrack.StopChasing();
+            _movementFacade.StopChasing();
             _meshRenderer.material = _previousMaterial;
-            _chaseTrack.OnReachTrack -= OnReachBootTrack;
+            _movementFacade.OnReachTrack -= OnReachBootTrack;
         }
 
         private void OnReachBootTrack()

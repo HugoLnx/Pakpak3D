@@ -8,10 +8,8 @@ namespace Pakpak3D
 
     public class HuntState : EnemyFSMState
     {
-        [SerializeField] private Transform _scatterTrack;
         [SerializeField] private float _forceScatterIfCloserThan = -1f;
-        private GhostChaseTrack _chaseTrack;
-        private GhostTargetChase _chasePakpak;
+        private GhostMovementFacade _movementFacade;
         private HuntInstructorService _instructor;
         private TargetDistanceTracker _targetDistanceTracker;
 
@@ -20,14 +18,12 @@ namespace Pakpak3D
 
         [LnxInit]
         private void Init(
-            GhostChaseTrack chaseTrack,
-            GhostTargetChase chasePakpak,
+            GhostMovementFacade movementFacade,
             HuntInstructorService huntInstructor,
             TargetDistanceTracker targetDistanceTracker
         )
         {
-            _chaseTrack = chaseTrack;
-            _chasePakpak = chasePakpak;
+            _movementFacade = movementFacade;
             _instructor = huntInstructor;
             _instructor.OnInstructionChanged += OnInstructionChanged;
             _targetDistanceTracker = targetDistanceTracker;
@@ -73,21 +69,18 @@ namespace Pakpak3D
                 SwitchToScatter();
                 return;
             }
-            _chaseTrack.StopChasing();
-            _chasePakpak.EnsureChasing();
+            _movementFacade.ChasePakpak();
         }
 
         private void SwitchToScatter()
         {
             if (!IsActive) return;
-            _chasePakpak.StopChasing();
-            _chaseTrack.EnsureChasing(_scatterTrack);
+            _movementFacade.LoopScatterTrack();
         }
 
         private void StopChasing()
         {
-            _chasePakpak.StopChasing();
-            _chaseTrack.StopChasing();
+            _movementFacade.StopChasing();
         }
 
         private void SetupDistanceTracker()

@@ -1,4 +1,3 @@
-using System;
 using LnxArch;
 using UnityEngine;
 
@@ -6,7 +5,9 @@ namespace Pakpak3D
 {
     public class Ghost : MonoBehaviour
     {
+        [SerializeField] private GhostTypeSO _ghostType;
         public bool IsScared => _fsm.Scared.IsActive;
+        public GhostTypeSO GhostType => _ghostType;
 
         private EnemyFSMMachine _fsm;
 

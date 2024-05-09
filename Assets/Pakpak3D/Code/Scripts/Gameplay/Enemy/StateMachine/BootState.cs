@@ -7,35 +7,29 @@ namespace Pakpak3D
 {
     public class BootState : EnemyFSMState
     {
-        [SerializeField] private Transform _bootTrack;
         [SerializeField] private float _bootMinTime = 3f;
         [SerializeField] private float _bootMaxTime = 12f;
         private EnemyFSMMachine _fsm;
-        private GhostChaseTrack _chaseTrack;
+        private GhostMovementFacade _movementFacade;
 
         [LnxInit]
-        private void Init(EnemyFSMMachine fsm, GhostChaseTrack chaseTrack)
+        private void Init(EnemyFSMMachine fsm, GhostMovementFacade movementFacade)
         {
             _fsm = fsm;
-            _chaseTrack = chaseTrack;
+            _movementFacade = movementFacade;
         }
 
         protected override void OnEnter(EnemyFSMState previousState)
         {
             StopAllCoroutines();
             StartCoroutine(WaitBoot());
-            ChaseBootTrack();
+            _movementFacade.LoopBootTrack();
         }
 
         protected override void OnExit(EnemyFSMState nextState)
         {
             StopAllCoroutines();
-            _chaseTrack.StopChasing();
-        }
-
-        private void ChaseBootTrack()
-        {
-            _chaseTrack.EnsureChasing(_bootTrack);
+            _movementFacade.StopChasing();
         }
 
         private IEnumerator WaitBoot()
