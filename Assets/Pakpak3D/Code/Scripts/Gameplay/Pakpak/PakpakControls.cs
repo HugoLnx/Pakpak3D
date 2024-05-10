@@ -11,18 +11,24 @@ namespace Pakpak3D
         private GameInputActions _input;
         private bool _wasEqual;
         private Vector2 _intentDirection;
+        public Vector2 PressingDirection { get; private set; }
 
         private void Awake()
         {
             this._input = new GameInputActions();
             this._input.Gameplay.Enable();
             this._input.Gameplay.Move.performed += ctx => OnMoveInput(ctx.ReadValue<Vector2>());
+            this._input.Gameplay.Move.canceled += ctx => OnMoveInput(Vector2.zero);
             this._input.Gameplay.Jump.performed += ctx => OnJump?.Invoke();
         }
 
         private void OnMoveInput(Vector2 direction)
         {
-            if (direction == Vector2.zero) return;
+            if (direction == Vector2.zero)
+            {
+                PressingDirection = Vector2.zero;
+                return;
+            }
 
             float xForce = Mathf.Abs(direction.x);
             float yForce = Mathf.Abs(direction.y);
@@ -43,6 +49,7 @@ namespace Pakpak3D
                 _intentDirection = new Vector2(0, Mathf.Sign(direction.y));
             }
             OnTurn?.Invoke(_intentDirection);
+            PressingDirection = _intentDirection;
             _wasEqual = isEqual;
         }
     }
