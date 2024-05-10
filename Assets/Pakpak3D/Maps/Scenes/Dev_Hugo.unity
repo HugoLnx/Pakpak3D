@@ -10230,6 +10230,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _skin: {fileID: 519656576}
   _initialDirection: {x: 0, y: 1}
+  _stopOnButtonRelease: 1
 --- !u!114 &1814452081
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10268,7 +10269,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d724287115334a940815a01ee95808aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 8
+  _speed: 5
   _forceCellSnapping: 1
   _ignoreHeightWhenSnapping: 0
 --- !u!1 &1822654574

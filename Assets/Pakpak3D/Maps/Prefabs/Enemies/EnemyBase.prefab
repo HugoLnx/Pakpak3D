@@ -58,7 +58,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d724287115334a940815a01ee95808aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 5
+  _speed: 2.5
   _forceCellSnapping: 1
   _ignoreHeightWhenSnapping: 1
 --- !u!114 &4613857467361419962
