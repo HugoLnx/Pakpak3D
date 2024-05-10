@@ -8,33 +8,39 @@ namespace Pakpak3D
 {
     public class Grid3DMovement : MonoBehaviour
     {
-        [SerializeField] private GridBoard _grid;
         [SerializeField] private float _speed = 5f;
         [SerializeField] private bool _forceCellSnapping = true;
         [SerializeField] private bool _ignoreHeightWhenSnapping = true;
+        private GridBoard _grid;
         private MovingPhysics _movingPhysics;
         private Vector3Int _targetDirection = Vector3Int.forward;
         private Vector3? _currentMovement;
-        private bool _isMovingAllowed;
+        private bool _isBlocked;
+
+        public bool WasAskedToPause { get; private set; } = true;
+        public bool IsPaused => WasAskedToPause && !IsMoving;
         public Vector3 Position => _movingPhysics.PositionPreview;
         public Vector3Int Cell => _grid.GetClosestCell(Position);
         public bool IsMoving => _currentMovement.HasValue;
         public Vector3Int? MovementDirection => IsMoving ? _targetDirection : null;
-        public bool IsMovingAllowed => _isMovingAllowed;
 
         public event Action OnReachCell;
         public event Action OnBlocked;
         public event Action OnUpdateTarget;
 
         [LnxInit]
-        private void Init(MovingPhysics movingPhysics)
+        private void Init(
+            MovingPhysics movingPhysics,
+            [FromParentEntity] GridBoard grid
+        )
         {
             _movingPhysics = movingPhysics;
+            _grid = grid;
         }
 
         private void FixedUpdate()
         {
-            if (!IsMovingAllowed) return;
+            if (_isBlocked || IsPaused) return;
             float step = _speed * Time.fixedDeltaTime;
             UpdateTargetMovement();
             while (IsMoving && step > 0)
@@ -55,12 +61,13 @@ namespace Pakpak3D
 
         public void ResumeMoving()
         {
-            _isMovingAllowed = true;
+            _isBlocked = false;
+            WasAskedToPause = false;
         }
 
-        public void StopMoving()
+        public void PauseMoving()
         {
-            _isMovingAllowed = false;
+            WasAskedToPause = true;
         }
 
         public Vector3 GetMovementEndPositionPreview()
@@ -76,14 +83,13 @@ namespace Pakpak3D
 
         private void UpdateTargetMovement()
         {
-            if (IsMoving) return;
+            if (IsMoving || WasAskedToPause) return;
 
             Vector3 currentPosition = this.Position;
-            bool isBlocked = !_grid.CanMoveTowards(currentPosition, _targetDirection);
-            if (isBlocked)
+            _isBlocked = !_grid.CanMoveTowards(currentPosition, _targetDirection);
+            if (_isBlocked)
             {
                 _currentMovement = null;
-                StopMoving();
                 OnBlocked?.Invoke();
                 OnUpdateTarget?.Invoke();
                 return;
@@ -96,7 +102,7 @@ namespace Pakpak3D
 
         private float ConsumeTargetMovementBy(float step)
         {
-            if (!IsMoving || !IsMovingAllowed) return 0;
+            if (!IsMoving || _isBlocked) return 0;
             float remainingMovement = _currentMovement.Value.magnitude;
 
             float remainingStep = 0;

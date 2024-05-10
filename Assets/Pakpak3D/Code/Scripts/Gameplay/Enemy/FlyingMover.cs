@@ -9,7 +9,7 @@ namespace Pakpak3D
 {
     public class FlyingMover : MonoBehaviour
     {
-        [SerializeField] private GridBoard _grid;
+        private GridBoard _grid;
         private Grid3DMovement _movement;
         private Vector2Int _targetDirection;
 
@@ -20,30 +20,38 @@ namespace Pakpak3D
         public event Action OnReachCell;
 
         [LnxInit]
-        private void Init(Grid3DMovement movement)
+        private void Init(
+            Grid3DMovement movement,
+            [FromParentEntity] GridBoard grid
+        )
         {
             _movement = movement;
             _movement.OnBlocked += BlockedCallback;
             _movement.OnReachCell += ReachCellCallback;
-            _movement.StopMoving();
+            _grid = grid;
         }
 
         public void TurnTo(Vector2Int direction)
         {
             _targetDirection = direction;
             _movement.TurnTo(direction.X0Y());
+            ResumeMoving();
+        }
+
+        public void ResumeMoving()
+        {
             _movement.ResumeMoving();
         }
 
-        public void StopMoving()
+        public void PauseMoving()
         {
-            _movement.StopMoving();
+            _movement.PauseMoving();
         }
 
         private void BlockedCallback()
         {
             _movement.TurnTo(Vector3Int.up);
-            _movement.ResumeMoving();
+            ResumeMoving();
         }
 
         private void ReachCellCallback()
@@ -61,8 +69,10 @@ namespace Pakpak3D
             if (!canFall) return false;
 
             Vector3Int nextCellCandidate = _movement.Cell + _targetDirection.X0Y();
-            Vector3 nextTargetPosition = _grid.Cell3DToPosition(nextCellCandidate);
-            bool nextWillFall = _grid.CanMoveTowards(nextTargetPosition, Vector3Int.down);
+            // Vector3 nextTargetPosition = _grid.Cell3DToPosition(nextCellCandidate);
+            // bool nextWillFall = _grid.CanMoveTowards(nextTargetPosition, Vector3Int.down);
+            int nextAboveGroundY = _grid.GetCellAboveGround(nextCellCandidate.XZ()).Value.y;
+            bool nextWillFall = nextAboveGroundY < _movement.Cell.y;
             return canFall && nextWillFall;
         }
     }

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Pakpak3D
 {
-    public class GhostChase : MonoBehaviour
+    public class GhostTargetChase : MonoBehaviour
     {
         private static readonly HashSet<Vector2Int> s_allDirections = new()
         {
@@ -16,27 +16,63 @@ namespace Pakpak3D
             Vector2Int.left,
             Vector2Int.right
         };
-        [SerializeField] private GridBoard _grid;
-        [SerializeField] private GridPathfinding _pathfinding;
         [SerializeField] private Transform _mainTarget;
         [SerializeField] private Transform _preferredWaypoint;
         [SerializeField] private float _minDistanceToIgnoreWaypoint = 1f;
+        [SerializeField] private bool _ignoreNavmesh = false;
+        private GridBoard _grid;
+        private GridPathfinding _pathfinding;
         private Vector3 _currentTargetPosition;
         private Vector2Int _direction;
         private FlyingMover _flying;
 
         [LnxInit]
         private void Init(
-            FlyingMover flying
+            FlyingMover flying,
+            [FromParentEntity] GridBoard grid,
+            [FromParentEntity] GridPathfinding pathfinding
         )
         {
             _flying = flying;
             _flying.OnReachCell += ReachCellCallback;
+            _grid = grid;
+            _pathfinding = pathfinding;
         }
 
         private void Start()
         {
             UpdateDirection();
+        }
+
+        public void SetChasing(
+            Transform mainTarget,
+            Transform preferredWaypoint = null,
+            float? minDistanceToIgnoreWaypoint = null,
+            bool ignoreNavmesh = false)
+        {
+            _mainTarget = mainTarget;
+            _preferredWaypoint = preferredWaypoint;
+            if (minDistanceToIgnoreWaypoint.HasValue)
+            {
+                _minDistanceToIgnoreWaypoint = minDistanceToIgnoreWaypoint.Value;
+            }
+            _ignoreNavmesh = ignoreNavmesh;
+            UpdateCurrentTargetPosition();
+        }
+
+        public float GetDistanceToTarget()
+        {
+            return Vector2.Distance(_flying.Position.XZ(), _currentTargetPosition.XZ());
+        }
+
+        public void ResumeChasing()
+        {
+            _flying.ResumeMoving();
+        }
+
+        public void PauseChasing()
+        {
+            _flying.PauseMoving();
         }
 
         private void ReachCellCallback()
@@ -64,7 +100,7 @@ namespace Pakpak3D
         private Vector2Int ChooseBestDirectionToTarget(IEnumerable<Vector2Int> directions)
         {
             Vector2? navmeshDirection = GetDirectionFromPathfinding();
-            if (!navmeshDirection.HasValue)
+            if (!navmeshDirection.HasValue && !_ignoreNavmesh)
             {
                 Debug.LogWarning($"No navmesh direction found. Fallback to direction approximation.");
             }
@@ -80,6 +116,7 @@ namespace Pakpak3D
 
         private Vector2? GetDirectionFromPathfinding()
         {
+            if (_ignoreNavmesh) return null;
             Vector2Int targetCell2d = _grid.GetClosestCell(_currentTargetPosition).XZ();
             Vector2? chosen = TryPathfindingTo(targetCell2d);
             if (chosen.HasValue)
@@ -129,12 +166,13 @@ namespace Pakpak3D
 
         private bool CanMoveTowardsOrGoUpAndMoveTowards(Vector3 position, Vector3Int direction)
         {
-            if (_grid.CanMoveTowards(position, direction))
-            {
-                return true;
-            }
-            Vector3 upPosition = position + Vector3.up * _grid.CellSize;
-            return _grid.CanMoveTowards(upPosition, direction);
+            return _grid.CanMoveTowards(position, direction, ignoreGround: true);
+            // if (_grid.CanMoveTowards(position, direction, ignoreGround: true))
+            // {
+            //     return true;
+            // }
+            // Vector3 upPosition = position + Vector3.up * _grid.CellSize;
+            // return _grid.CanMoveTowards(upPosition, direction);
         }
 
         private void TurnTo(Vector2Int direction)
@@ -146,7 +184,6 @@ namespace Pakpak3D
         private void UpdateCurrentTargetPosition()
         {
             _currentTargetPosition = GetCurrentTargetPosition();
-
         }
 
         private Vector3 GetCurrentTargetPosition()
