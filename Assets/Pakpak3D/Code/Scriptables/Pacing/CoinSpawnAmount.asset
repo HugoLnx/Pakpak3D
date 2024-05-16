@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 674d656e674700349abefd2dc6add26b, type: 3}
+  m_Name: CoinSpawnAmount
+  m_EditorClassIdentifier: 
+  <Description>k__BackingField: How many coins are spawned at once
+  <BeginValue>k__BackingField: 3
+  <EndValue>k__BackingField: 50
+  <Curve>k__BackingField:
+    _ease: 0
+    _useAnimationCurve: 0
+    _animationCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.5
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 3.9958727
+        outSlope: 3.9958727
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.06374502
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    _inverseT: 0
+    _scaleT: 1
+    _offsetT: 0

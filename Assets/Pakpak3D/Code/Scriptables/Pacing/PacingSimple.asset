@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2be85d0baebdaff4fb564f3e9bad085b, type: 3}
+  m_Name: PacingSimple
+  m_EditorClassIdentifier: 
+  <Attributes>k__BackingField:
+  - {fileID: 11400000, guid: 3ee04d3afcf838445a56a9fd1eb90639, type: 2}
+  - {fileID: 11400000, guid: e0db27175fae93d4b9b21f1b525bc500, type: 2}
+  - {fileID: 11400000, guid: 66e86443b8b250f40954a28b9781d5ed, type: 2}
+  - {fileID: 11400000, guid: e00c7ca51f8ad684fb356ad8afb256af, type: 2}
+  - {fileID: 11400000, guid: a7f0125f8c308f4419d74f091209e6a0, type: 2}
+  - {fileID: 11400000, guid: a71822b862ba9f347b8403584fdaac50, type: 2}
+  <Curve>k__BackingField:
+    _ease: 1
+    _useAnimationCurve: 0
+    _animationCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    _inverseT: 0
+    _scaleT: 1
+    _offsetT: 0
+  _amountOfReusedValueSetReferences: 20
