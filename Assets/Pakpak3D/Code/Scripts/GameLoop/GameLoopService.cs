@@ -3,10 +3,8 @@ using System.Collections;
 using System.Linq;
 using EasyButtons;
 using LnxArch;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.TestTools;
 
 namespace Pakpak3D
 {
