@@ -32,7 +32,6 @@ namespace Pakpak3D
 
         private void UpdateScore(int total)
         {
-            Debug.Log($"UpdateScore: {total}");
             _scoreText.text = total.ToString();
         }
     }

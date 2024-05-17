@@ -14,7 +14,7 @@ namespace Pakpak3D
 
         public void SpreadInstruction(HuntInstruction instruction)
         {
-            Debug.Log($"Instruction changed to {instruction}");
+            // Debug.Log($"Instruction changed to {instruction}");
             _instruction = instruction;
             OnInstructionChanged?.Invoke(instruction);
         }

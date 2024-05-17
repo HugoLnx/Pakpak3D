@@ -1,12 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using LnxArch;
 using SensenToolkit;
 using SensenToolkit.Gizmosx;
 using UnityEngine;
 
 namespace Pakpak3D
 {
+    [LnxService]
     public class GridBoard : MonoBehaviour
     {
         [SerializeField] private float _cellSize = 1f;
@@ -75,6 +77,18 @@ namespace Pakpak3D
             return GetClosestCell(hit.point + Vector3.up * (_cellSize * 0.5f));
         }
 
+        public bool HasWallOn(Vector2Int cell2d)
+        {
+            float wallMaxHeight = _cellSize * 20f;
+            Vector3 cellSkyPosition = Cell2DToPosition(cell2d).X0Y() + Vector3.up * wallMaxHeight;
+            return Physics.Raycast(
+                origin: cellSkyPosition,
+                direction: Vector3.down,
+                maxDistance: wallMaxHeight + _cellSize,
+                layerMask: WallLayerMask
+            );
+        }
+
         // TODO: Remove this logic from GridBoard because each object must have it's own buffer
         private Vector3[] _rayMoveOriginsBuffer = new Vector3[4];
         public bool CanMoveTowards(Vector3 position, Vector3Int direction, bool ignoreGround = false)
@@ -117,6 +131,21 @@ namespace Pakpak3D
             return CanMoveTowards(position, Vector3Int.down);
         }
 
+        public IEnumerable<Vector2Int> EnumerateCells2D()
+        {
+            int minCellX = -Mathf.CeilToInt(_cellCountX / 2f - 1);
+            int maxCellX = _cellCountX / 2;
+            int minCellZ = -Mathf.CeilToInt(_cellCountZ / 2f - 1);
+            int maxCellZ = _cellCountZ / 2;
+            for (int cellX = minCellX; cellX <= maxCellX; cellX++)
+            {
+                for (int cellZ = minCellZ; cellZ <= maxCellZ; cellZ++)
+                {
+                    yield return new Vector2Int(cellX, cellZ);
+                }
+            }
+        }
+
         private void GetTransversals(Vector3Int direction, out Vector3Int transversal1, out Vector3Int transversal2)
         {
             Vector3Int candidate1 = new(direction.z, 0, direction.x);
@@ -156,42 +185,27 @@ namespace Pakpak3D
 
         private void DrawFloorGizmos()
         {
-            ForEachCell2D((cell2d) =>
+            foreach (Vector2Int cell2d in EnumerateCells2D())
             {
                 Vector3Int cell3d = cell2d.X0Y();
                 Vector3 center = Cell3DToPosition(cell3d)
                     + Vector3.down * (_cellSize * 0.5f);
                 Gizmos.DrawWireCube(center, new Vector3(_cellSize, 0.1f, _cellSize));
-            });
+            }
         }
 
         private void DrawLayeredCubeGizmos()
         {
             for (int cellY = 0; cellY < _cellCountHeight; cellY++)
             {
-                ForEachCell2D((cell2d) =>
+                foreach (Vector2Int cell2d in EnumerateCells2D())
                 {
                     int cellX = cell2d.x;
                     int cellZ = cell2d.y;
                     Vector3Int cell3d = new(cellX, cellY, cellZ);
                     Vector3 center = Cell3DToPosition(cell3d);
                     Gizmos.DrawWireCube(center, Vector3.one * _cellSize);
-                });
-            }
-        }
-
-        private void ForEachCell2D(System.Action<Vector2Int> action)
-        {
-            int minCellX = -Mathf.CeilToInt(_cellCountX / 2f - 1);
-            int maxCellX = _cellCountX / 2;
-            int minCellZ = -Mathf.CeilToInt(_cellCountZ / 2f - 1);
-            int maxCellZ = _cellCountZ / 2;
-            for (int cellX = minCellX; cellX <= maxCellX; cellX++)
-            {
-                for (int cellZ = minCellZ; cellZ <= maxCellZ; cellZ++)
-                {
-                    action(new Vector2Int(cellX, cellZ));
-                }
+                };
             }
         }
     }

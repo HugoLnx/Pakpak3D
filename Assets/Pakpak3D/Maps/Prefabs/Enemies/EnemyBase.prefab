@@ -285,7 +285,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7531b678efd3e1645992249c8eb20de1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _debug: 1
+  _debug: 0
   <GoHunt>k__BackingField: {fileID: 11400000, guid: a8c00cc16361aca4fba81d00f62ea54d,
     type: 2}
   <GetScared>k__BackingField: {fileID: 11400000, guid: e654949ce4149f5478bbd2b00c5e5820,
