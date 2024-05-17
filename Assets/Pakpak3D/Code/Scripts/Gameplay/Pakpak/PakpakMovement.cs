@@ -9,7 +9,6 @@ namespace Pakpak3D
 {
     public class PakpakMovement : MonoBehaviour
     {
-        public const string TAG = "Pakpak";
         [SerializeField] private Transform _skin;
         [SerializeField] private Vector2Int _initialDirection = Vector2Int.up;
         [SerializeField] private bool _stopOnButtonRelease = true;

@@ -77,7 +77,7 @@ namespace Pakpak3D
             {
                 OnAllRequiredCollected?.Invoke();
             }
-            Debug.Log($"Collectable {collectable.name} collected. Required: {isRequired}. Remaining required: {_requiredCollectables.Count}");
+            // Debug.Log($"Collectable {collectable.name} collected. Required: {isRequired}. Remaining required: {_requiredCollectables.Count}");
         }
     }
 }

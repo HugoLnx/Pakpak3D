@@ -6,22 +6,27 @@ namespace Pakpak3D
 {
     public class EatenState : EnemyFSMState
     {
+        [SerializeField] private int _score = 235;
         [SerializeField] private Material _eatenMaterial;
+        [SerializeField] private ParticleSystem _explosionVfx;
         private EnemyFSMMachine _fsm;
         private GhostMovementFacade _movementFacade;
         private MeshRenderer _meshRenderer;
+        private ScoreService _scoreService;
         private Material _previousMaterial;
 
         [LnxInit]
         private void Init(
             EnemyFSMMachine fsm,
             GhostMovementFacade movementFacade,
-            MeshRenderer meshRenderer
+            MeshRenderer meshRenderer,
+            ScoreService scoreService
         )
         {
             _fsm = fsm;
             _movementFacade = movementFacade;
             _meshRenderer = meshRenderer;
+            _scoreService = scoreService;
         }
 
         protected override void OnEnter(EnemyFSMState previousState)
@@ -31,6 +36,12 @@ namespace Pakpak3D
             _movementFacade.LoopBootTrack();
             _previousMaterial = _meshRenderer.material;
             _meshRenderer.material = _eatenMaterial;
+            bool wasEaten = previousState == _fsm.Scared;
+            if (wasEaten)
+            {
+                _explosionVfx.Play();
+                _scoreService.AddScore(_score);
+            }
         }
 
         protected override void OnExit(EnemyFSMState nextState)

@@ -1,22 +1,13 @@
+using System;
 using System.Collections.Generic;
 using LnxArch;
+using SensenToolkit;
 using SensenToolkit.Gizmosx;
+using SensenToolkit.Utils;
 using UnityEngine;
 
 namespace Pakpak3D
 {
-    // public class GraphNode<T> : IGraphNode
-    // {
-    //     private HashSet<IGraphNode> _neighbors = new();
-    //     public IEnumerable<IGraphNode> Neighbors => _neighbors;
-    //     public bool Visited { get; set; }
-    //     public T Value { get; set; }
-    //     public void AddNeighbor(IGraphNode neighbor)
-    //     {
-    //         _neighbors.Add(neighbor);
-    //     }
-    // }
-
     [LnxService]
     public class MazeService : MonoBehaviour
     {
@@ -31,10 +22,19 @@ namespace Pakpak3D
 
         public HashSet<Vector3Int> GetSurfaceCellsRandomAreaSubset(float coverage)
         {
-            // TODO: Implement coverage
-            return GetAllSurfaceCells();
-        }
+            HashSet<Vector3Int> allCells = GetAllSurfaceCells();
+            SimpleGraph<SimpleGraphNode<Vector3Int>> graph = BuildCellsGraph(allCells);
 
+            int targetCount = Mathf.CeilToInt(allCells.Count * coverage);
+            HashSet<Vector3Int> cellsSubset = new();
+            SimpleGraphNode<Vector3Int> startNode = graph.Nodes.GetRandomElement();
+            foreach (SimpleGraphNode<Vector3Int> node in graph.EnumerateBreadthTraverse(startNode))
+            {
+                cellsSubset.Add(node.Value);
+                if (cellsSubset.Count >= targetCount) break;
+            }
+            return cellsSubset;
+        }
         public HashSet<Vector3Int> GetAllSurfaceCells()
         {
             HashSet<Vector3Int> cells = new();
@@ -47,6 +47,33 @@ namespace Pakpak3D
             }
 
             return cells;
+        }
+
+        private SimpleGraph<SimpleGraphNode<Vector3Int>> BuildCellsGraph(HashSet<Vector3Int> allCells)
+        {
+            Dictionary<Vector2Int, SimpleGraphNode<Vector3Int>> nodesDict = new();
+            foreach (Vector3Int cell3d in allCells)
+            {
+                Vector2Int cell2d = cell3d.XZ();
+                if (!nodesDict.ContainsKey(cell2d))
+                {
+                    nodesDict[cell2d] = new SimpleGraphNode<Vector3Int>(cell3d);
+                }
+            }
+
+            SimpleGraph<SimpleGraphNode<Vector3Int>> graph = new();
+            foreach ((Vector2Int cell2d, SimpleGraphNode<Vector3Int> node) in nodesDict)
+            {
+                foreach (Direction4 direction in Direction4.All)
+                {
+                    Vector2Int neighbor2d = cell2d + direction.VectorInt;
+                    if (nodesDict.TryGetValue(neighbor2d, out SimpleGraphNode<Vector3Int> neighborNode))
+                    {
+                        graph.LinkBothway(node, neighborNode);
+                    }
+                }
+            }
+            return graph;
         }
 
         private void OnDrawGizmosSelected()

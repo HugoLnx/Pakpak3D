@@ -10,6 +10,7 @@ namespace Pakpak3D
         [field: SerializeField] public Collectable PointPrefab { get; private set; }
         [field: SerializeField] public Collectable SpecialPointPrefab { get; private set; }
         [field: SerializeField] public float ScoreMultiplier { get; private set; } = 1.0f;
+        [field: SerializeField] public ParticleSystem StartVfx { get; private set; }
         public int Inx { get; set; }
 
         public CollectableSpawningBatchConfigSO CreateBatchConfig(int pointCount, int specialPointCount, float mazeCoverage)
@@ -20,7 +21,7 @@ namespace Pakpak3D
             if (specialPointCount > 0)
             {
                 SpecialPointPrefab.GetComponentInChildren<PointCollectable>().SetScoreMultiplier(ScoreMultiplier);
-                configs.Add(new CollectableSpawningConfig(SpecialPointPrefab, specialPointCount, isOptionalToCollect: true));
+                configs.Add(new CollectableSpawningConfig(SpecialPointPrefab, specialPointCount, isOptionalToCollect: false));
             }
             return CollectableSpawningBatchConfigSO.Create(configs, mazeCoverage);
         }

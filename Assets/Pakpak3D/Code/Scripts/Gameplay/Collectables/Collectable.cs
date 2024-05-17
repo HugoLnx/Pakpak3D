@@ -37,7 +37,7 @@ namespace Pakpak3D
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!other.CompareTag(PakpakMovement.TAG)) return;
+            if (!other.CompareTag(Pakpak.TAG)) return;
             Collect();
         }
 

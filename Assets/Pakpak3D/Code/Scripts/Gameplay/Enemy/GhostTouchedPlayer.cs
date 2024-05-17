@@ -22,8 +22,13 @@ namespace Pakpak3D
 
         private void OnSensedEnter(Collider collider)
         {
-            if (collider.CompareTag(PakpakMovement.TAG))
+            if (collider.CompareTag(Pakpak.TAG))
             {
+                Pakpak pakpak = collider.GetComponentInChildren<Pakpak>();
+                if (_ghost.IsDangerous && !pakpak.IsInCooldown)
+                {
+                    pakpak.TakeHit();
+                }
                 _ghost.TouchedPlayer();
             }
         }

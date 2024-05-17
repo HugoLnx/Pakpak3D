@@ -54,7 +54,7 @@ namespace Pakpak3D
                 .AddTransition(EnteredHouse, Boot);
 
             builder.From(KillPakpak)
-                .AddTransition(TimerEnded, Boot);
+                .AddTransition(TimerEnded, Eaten);
 
             return builder.Get();
         }
