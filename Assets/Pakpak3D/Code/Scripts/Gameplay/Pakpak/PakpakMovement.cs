@@ -12,6 +12,7 @@ namespace Pakpak3D
         public const string TAG = "Pakpak";
         [SerializeField] private Transform _skin;
         [SerializeField] private Vector2Int _initialDirection = Vector2Int.up;
+        [SerializeField] private bool _stopOnButtonRelease = true;
         private PakpakControls _controls;
         private Grid2DMovement _movement;
         private GridJump _jump;
@@ -25,9 +26,15 @@ namespace Pakpak3D
 
             _controls.OnTurn += TurnTo;
             _controls.OnJump += Jump;
-            _movement.OnReachCell += () => _jump.Fall();
+            _movement.OnReachCell += OnReachCell;
             _movement.OnUpdateTarget += UpdateTargetCallback;
             _jump.AfterJumpRise += () => _movement.ResumeMoving();
+        }
+
+        private void OnReachCell()
+        {
+            TurnTo(_controls.PressingDirection);
+            _jump.Fall();
         }
 
         private void Start()
@@ -37,7 +44,16 @@ namespace Pakpak3D
 
         public void TurnTo(Vector2 direction)
         {
-            _movement.TurnTo(direction);
+            bool isForcingDirectionSomewhere = direction != Vector2.zero;
+            if (isForcingDirectionSomewhere)
+            {
+                _movement.TurnTo(direction);
+                _movement.ResumeMoving();
+            }
+            else if (_stopOnButtonRelease)
+            {
+                _movement.PauseMoving();
+            }
         }
 
         public void Jump()

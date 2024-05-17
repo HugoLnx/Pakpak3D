@@ -33,12 +33,16 @@ namespace Pakpak3D
                 return;
             }
             _movement3d.TurnTo(direction.X0Y().AsVector3Int());
-            ResumeMoving();
         }
 
         public void ResumeMoving()
         {
             _movement3d.ResumeMoving();
+        }
+
+        public void PauseMoving()
+        {
+            _movement3d.PauseMoving();
         }
 
         public Vector2 GetMovementEndPositionPreview()
