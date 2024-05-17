@@ -14,4 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Description>k__BackingField: Ghost speed relative to player speed
   <BeginValue>k__BackingField: 0.5
-  <EndValue>k__BackingField: 1.05
+  <EndValue>k__BackingField: 0.75
+  <Curve>k__BackingField:
+    _ease: 0
+    _useAnimationCurve: 0
+    _animationCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    _inverseT: 0
+    _scaleT: 1
+    _offsetT: 0

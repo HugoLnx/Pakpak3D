@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Description>k__BackingField: How many coins are spawned at once
   <BeginValue>k__BackingField: 3
-  <EndValue>k__BackingField: 50
+  <EndValue>k__BackingField: 20
   <Curve>k__BackingField:
-    _ease: 0
+    _ease: 1
     _useAnimationCurve: 0
     _animationCurve:
       serializedVersion: 2

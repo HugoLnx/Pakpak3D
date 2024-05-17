@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using LnxArch;
 using UnityEngine;
 using TMPro;
+using System;
 
 namespace Pakpak3D
 {
@@ -32,7 +33,6 @@ namespace Pakpak3D
 
         private void UpdateScore(int total)
         {
-            Debug.Log($"UpdateScore: {total}");
             _scoreText.text = total.ToString();
         }
     }

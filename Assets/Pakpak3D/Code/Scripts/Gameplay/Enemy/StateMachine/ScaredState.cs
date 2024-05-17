@@ -6,6 +6,7 @@ namespace Pakpak3D
     public class ScaredState : EnemyFSMState
     {
         [SerializeField] private Material _scaredMaterial;
+        [SerializeField] private ParticleSystem _explosionVfx;
         private GhostMovementFacade _movementFacade;
         private MeshRenderer _meshRenderer;
         private Material _previousMaterial;
@@ -23,6 +24,7 @@ namespace Pakpak3D
             _movementFacade.LoopScatterTrack();
             _previousMaterial = _meshRenderer.material;
             _meshRenderer.material = _scaredMaterial;
+            // _explosionVfx.Play();
         }
 
         protected override void OnExit(EnemyFSMState nextState)

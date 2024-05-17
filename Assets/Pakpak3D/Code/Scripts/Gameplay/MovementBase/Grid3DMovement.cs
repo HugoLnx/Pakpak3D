@@ -9,6 +9,7 @@ namespace Pakpak3D
     public class Grid3DMovement : MonoBehaviour
     {
         [SerializeField] private float _speed = 5f;
+        public float Speed => _speed;
         [SerializeField] private bool _forceCellSnapping = true;
         [SerializeField] private bool _ignoreHeightWhenSnapping = true;
         private GridBoard _grid;
@@ -36,6 +37,11 @@ namespace Pakpak3D
         {
             _movingPhysics = movingPhysics;
             _grid = grid;
+        }
+
+        public void SetSpeed(float speed)
+        {
+            _speed = speed;
         }
 
         private void FixedUpdate()

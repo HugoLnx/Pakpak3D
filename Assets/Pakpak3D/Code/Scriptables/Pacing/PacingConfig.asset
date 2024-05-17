@@ -20,7 +20,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a7f0125f8c308f4419d74f091209e6a0, type: 2}
   - {fileID: 11400000, guid: a71822b862ba9f347b8403584fdaac50, type: 2}
   <LevelsCount>k__BackingField: 3
-  <EasyMax>k__BackingField: 0.5
+  <EasyMax>k__BackingField: 0.25
   <EasyCurve>k__BackingField:
     _ease: 0
     _useAnimationCurve: 0
@@ -30,8 +30,10 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    _inverseX: 0
-  <HardMin>k__BackingField: 0.37
+    _inverseT: 0
+    _scaleT: 1
+    _offsetT: 0
+  <HardMin>k__BackingField: 0.75
   <HardCurve>k__BackingField:
     _ease: 0
     _useAnimationCurve: 0
@@ -41,7 +43,9 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    _inverseX: 0
+    _inverseT: 0
+    _scaleT: 1
+    _offsetT: 0
   <LevelInnerCurve>k__BackingField:
     _ease: 1
     _useAnimationCurve: 0
@@ -60,4 +64,6 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    _inverseX: 0
+    _inverseT: 0
+    _scaleT: 1
+    _offsetT: 0
